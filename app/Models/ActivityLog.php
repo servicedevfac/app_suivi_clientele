@@ -8,4 +8,16 @@ class ActivityLog extends Model
 {
     protected $fillable = ['user_id', 'action', 'module', 'description', 'ip_address', 'user_agent'];
     public function user() { return $this->belongsTo(User::class); }
+
+    public static function log($action, $module = null, $description = null)
+    {
+        return self::create([
+            'user_id' => auth()->id(),
+            'action' => $action,
+            'module' => $module,
+            'description' => $description,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
 }

@@ -15,4 +15,4 @@ class Vente extends Model
     public function produit() { return $this->belongsTo(Produit::class); }
     public function commercial() { return $this->belongsTo(User::class, 'commercial_id'); }
     public function filiale() { return $this->belongsTo(Filiale::class); }
-}
+} 

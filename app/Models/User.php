@@ -30,6 +30,11 @@ class User extends Authenticatable
         ];
     }
 
+    public function getNameAttribute(): string
+    {
+        return trim(($this->prenom ?? '') . ' ' . ($this->nom ?? ''));
+    }
+
     public function prospects() { return $this->hasMany(Prospect::class, 'commercial_id'); }
     public function relances() { return $this->hasMany(Relance::class, 'commercial_id'); }
     public function tasks() { return $this->hasMany(Task::class); }
