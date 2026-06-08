@@ -37,9 +37,12 @@ class UpdateProspectRequest extends FormRequest
             'ville' => ['nullable', 'string', 'max:255'],
             'statut' => ['required', 'string', 'in:Nouveau,Contacté,Qualifié,En négociation,Gagné,Perdu'],
             'besoin' => ['nullable', 'string'],
+            'montant_estime' => ['nullable', 'numeric', 'min:0'],
+            'probabilite' => ['nullable', 'integer', 'min:0', 'max:100'],
             'commentaire' => ['nullable', 'string'],
             'date_contact' => ['nullable', 'date'],
             'prochain_rappel' => ['nullable', 'date'],
+            'tags' => ['nullable', 'string'],
         ];
     }
 }

@@ -15,4 +15,9 @@ class Client extends Model
     public function commercial() { return $this->belongsTo(User::class, 'commercial_id'); }
     public function filiale() { return $this->belongsTo(Filiale::class); }
     public function ventes() { return $this->hasMany(Vente::class); }
+
+    public function getNomCompletAttribute(): string
+    {
+        return trim(($this->prenom ?? '') . ' ' . ($this->nom ?? ''));
+    }
 }

@@ -39,4 +39,19 @@ class User extends Authenticatable
     public function relances() { return $this->hasMany(Relance::class, 'commercial_id'); }
     public function tasks() { return $this->hasMany(Task::class); }
     public function logs() { return $this->hasMany(ActivityLog::class); }
+    public function objectifs() { return $this->hasMany(Objectif::class, 'commercial_id'); }
+
+    public static function getAssignableUsers()
+    {
+        $user = auth()->user();
+        if ($user->hasRole(['Administrateur', 'Directeur Général'])) {
+            return self::all();
+        }
+        if ($user->hasRole('Responsable Commercial')) {
+            return self::whereDoesntHave('roles', function($q) {
+                $q->whereIn('name', ['Administrateur', 'Directeur Général']);
+            })->get();
+        }
+        return self::where('id', $user->id)->get();
+    }
 }

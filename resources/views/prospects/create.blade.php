@@ -164,6 +164,20 @@
                         <x-input-error :messages="$errors->get('date_contact')" class="mt-2 text-xs" />
                     </div>
 
+                    <!-- Montant Estimé -->
+                    <div>
+                        <x-input-label for="montant_estime" value="Montant estimé (€)" class="text-slate-700 font-semibold" />
+                        <x-text-input id="montant_estime" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="number" step="0.01" name="montant_estime" :value="old('montant_estime')" />
+                        <x-input-error :messages="$errors->get('montant_estime')" class="mt-2 text-xs" />
+                    </div>
+
+                    <!-- Probabilité -->
+                    <div>
+                        <x-input-label for="probabilite" value="Probabilité (%)" class="text-slate-700 font-semibold" />
+                        <x-text-input id="probabilite" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="number" min="0" max="100" name="probabilite" :value="old('probabilite')" />
+                        <x-input-error :messages="$errors->get('probabilite')" class="mt-2 text-xs" />
+                    </div>
+
                     <!-- Besoin -->
                     <div class="md:col-span-2">
                         <x-input-label for="besoin" value="Besoin qualifié" class="text-slate-700 font-semibold" />
@@ -176,6 +190,14 @@
                         <x-input-label for="commentaire" value="Commentaire / Notes" class="text-slate-700 font-semibold" />
                         <textarea id="commentaire" name="commentaire" rows="2" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm">{{ old('commentaire') }}</textarea>
                         <x-input-error :messages="$errors->get('commentaire')" class="mt-2 text-xs" />
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="md:col-span-2">
+                        <x-input-label for="tags" value="Tags (séparés par des virgules)" class="text-slate-700 font-semibold" />
+                        <x-text-input id="tags" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm" type="text" name="tags" :value="old('tags')" placeholder="ex: VIP, Urgent, Secteur IT" />
+                        <p class="text-[10px] text-slate-500 mt-1">Séparez chaque tag par une virgule.</p>
+                        <x-input-error :messages="$errors->get('tags')" class="mt-2 text-xs" />
                     </div>
 
                     <!-- Prochain Rappel -->

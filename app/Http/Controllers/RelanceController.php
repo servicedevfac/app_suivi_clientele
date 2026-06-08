@@ -16,7 +16,7 @@ class RelanceController extends Controller
         $query = Relance::with(['prospect', 'commercial']);
 
         // Restrictions par rôle
-        if (!auth()->user()->hasRole('Administrateur')) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
             $query->where('commercial_id', auth()->id());
         } elseif (request()->filled('commercial_id')) {
             $query->where('commercial_id', request('commercial_id'));
@@ -44,7 +44,7 @@ class RelanceController extends Controller
 
         $relances = $query->orderBy('date_relance', 'asc')->orderBy('heure_relance', 'asc')->paginate(15);
         $commercials = \App\Models\User::all();
-        $prospects = auth()->user()->hasRole('Administrateur') 
+        $prospects = auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') 
             ? \App\Models\Prospect::all() 
             : \App\Models\Prospect::where('commercial_id', auth()->id())->get();
 
@@ -56,8 +56,8 @@ class RelanceController extends Controller
      */
     public function create()
     {
-        $commercials = \App\Models\User::all();
-        $prospects = auth()->user()->hasRole('Administrateur') 
+        $commercials = \App\Models\User::getAssignableUsers();
+        $prospects = auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') 
             ? \App\Models\Prospect::all() 
             : \App\Models\Prospect::where('commercial_id', auth()->id())->get();
 
@@ -71,7 +71,12 @@ class RelanceController extends Controller
     {
         $data = $request->validated();
 
-        if (!auth()->user()->hasRole('Administrateur')) {
+        $assignableUsers = \App\Models\User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($data['commercial_id']) && !in_array($data['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner une relance à ce collaborateur (supérieur).");
+        }
+
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
             $data['commercial_id'] = auth()->id();
         }
 
@@ -101,7 +106,7 @@ class RelanceController extends Controller
      */
     public function show(Relance $relance)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $relance->commercial_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $relance->commercial_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à voir cette relance.');
         }
 
@@ -113,12 +118,12 @@ class RelanceController extends Controller
      */
     public function edit(Relance $relance)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $relance->commercial_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $relance->commercial_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à modifier cette relance.');
         }
 
-        $commercials = \App\Models\User::all();
-        $prospects = auth()->user()->hasRole('Administrateur') 
+        $commercials = \App\Models\User::getAssignableUsers();
+        $prospects = auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') 
             ? \App\Models\Prospect::all() 
             : \App\Models\Prospect::where('commercial_id', auth()->id())->get();
 
@@ -130,13 +135,18 @@ class RelanceController extends Controller
      */
     public function update(UpdateRelanceRequest $request, Relance $relance)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $relance->commercial_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $relance->commercial_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à modifier cette relance.');
         }
 
         $data = $request->validated();
 
-        if (!auth()->user()->hasRole('Administrateur')) {
+        $assignableUsers = \App\Models\User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($data['commercial_id']) && !in_array($data['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner une relance à ce collaborateur (supérieur).");
+        }
+
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
             $data['commercial_id'] = auth()->id();
         }
 
@@ -167,7 +177,7 @@ class RelanceController extends Controller
      */
     public function destroy(Relance $relance)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $relance->commercial_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $relance->commercial_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à supprimer cette relance.');
         }
 

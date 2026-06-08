@@ -65,6 +65,32 @@
                 </x-sidebar-link>
             </div>
 
+            <!-- SECTION : PILOTAGE & PERFORMANCES -->
+            <div class="space-y-1">
+                <span class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Performances</span>
+                
+                <x-sidebar-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" @click="sidebarOpen = false">
+                    <x-slot name="icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </x-slot>
+                    Rapports Avancés
+                </x-sidebar-link>
+
+                @role('Administrateur|Directeur Général|Responsable Commercial')
+                <x-sidebar-link :href="route('objectifs.index')" :active="request()->routeIs('objectifs.*')" @click="sidebarOpen = false">
+                    <x-slot name="icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </x-slot>
+                    Objectifs
+                </x-sidebar-link>
+                @endrole
+            </div>
+
+
             <!-- SECTION : PLANIFICATION -->
             <div class="space-y-1">
                 <span class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Planification</span>
@@ -76,6 +102,15 @@
                         </svg>
                     </x-slot>
                     Tâches
+                </x-sidebar-link>
+
+                <x-sidebar-link :href="route('agenda.index')" :active="request()->routeIs('agenda.*')">
+                    <x-slot name="icon">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </x-slot>
+                    Agenda
                 </x-sidebar-link>
 
                 <x-sidebar-link :href="route('relances.index')" :active="request()->routeIs('relances.*')">
@@ -317,6 +352,31 @@
                     </x-sidebar-link>
                 </div>
 
+                <!-- SECTION : PILOTAGE & PERFORMANCES -->
+                <div class="space-y-1">
+                    <span class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Performances</span>
+                    
+                    <x-sidebar-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" @click="sidebarOpen = false">
+                        <x-slot name="icon">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </x-slot>
+                        Rapports Avancés
+                    </x-sidebar-link>
+
+                    @role('Administrateur|Directeur Général|Responsable Commercial')
+                    <x-sidebar-link :href="route('objectifs.index')" :active="request()->routeIs('objectifs.*')" @click="sidebarOpen = false">
+                        <x-slot name="icon">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </x-slot>
+                        Objectifs
+                    </x-sidebar-link>
+                    @endrole
+                </div>
+
                 <!-- SECTION : PLANIFICATION -->
                 <div class="space-y-1">
                     <span class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Planification</span>
@@ -328,6 +388,15 @@
                             </svg>
                         </x-slot>
                         Tâches
+                    </x-sidebar-link>
+
+                    <x-sidebar-link :href="route('agenda.index')" :active="request()->routeIs('agenda.*')" @click="sidebarOpen = false">
+                        <x-slot name="icon">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </x-slot>
+                        Agenda
                     </x-sidebar-link>
 
                     <x-sidebar-link :href="route('relances.index')" :active="request()->routeIs('relances.*')" @click="sidebarOpen = false">

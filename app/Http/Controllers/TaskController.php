@@ -16,7 +16,7 @@ class TaskController extends Controller
         $query = Task::with(['user', 'prospect']);
 
         // Restrictions par rôle
-        if (!auth()->user()->hasRole('Administrateur')) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
             $query->where('user_id', auth()->id());
         } elseif (request()->filled('user_id')) {
             $query->where('user_id', request('user_id'));
@@ -49,9 +49,9 @@ class TaskController extends Controller
      */
     public function create()
     {
-        $users = \App\Models\User::all();
+        $users = \App\Models\User::getAssignableUsers();
         // Les commerciaux ne peuvent créer des tâches que pour eux-mêmes (ou par défaut assignées à eux)
-        $prospects = auth()->user()->hasRole('Administrateur') 
+        $prospects = auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') 
             ? \App\Models\Prospect::all() 
             : \App\Models\Prospect::where('commercial_id', auth()->id())->get();
 
@@ -65,8 +65,13 @@ class TaskController extends Controller
     {
         $data = $request->validated();
         
+        $assignableUsers = \App\Models\User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($data['user_id']) && !in_array($data['user_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner une tâche à ce collaborateur (supérieur).");
+        }
+
         // Sécurité : si non-admin, la tâche est forcément assignée à soi-même
-        if (!auth()->user()->hasRole('Administrateur')) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
             $data['user_id'] = auth()->id();
         }
 
@@ -95,7 +100,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $task->user_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $task->user_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à voir cette tâche.');
         }
 
@@ -107,12 +112,12 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $task->user_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $task->user_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à modifier cette tâche.');
         }
 
-        $users = \App\Models\User::all();
-        $prospects = auth()->user()->hasRole('Administrateur') 
+        $users = \App\Models\User::getAssignableUsers();
+        $prospects = auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') 
             ? \App\Models\Prospect::all() 
             : \App\Models\Prospect::where('commercial_id', auth()->id())->get();
 
@@ -124,14 +129,19 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $task->user_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $task->user_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à modifier cette tâche.');
         }
 
         $data = $request->validated();
 
+        $assignableUsers = \App\Models\User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($data['user_id']) && !in_array($data['user_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner une tâche à ce collaborateur (supérieur).");
+        }
+
         // Sécurité : si non-admin, on ne peut pas réassigner la tâche à quelqu'un d'autre
-        if (!auth()->user()->hasRole('Administrateur')) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
             $data['user_id'] = auth()->id();
         }
 
@@ -161,7 +171,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $task->user_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $task->user_id !== auth()->id()) {
             abort(403, 'Vous n\'êtes pas autorisé à supprimer cette tâche.');
         }
 
@@ -182,7 +192,7 @@ class TaskController extends Controller
      */
     public function updateStatus(\Illuminate\Http\Request $request, Task $task)
     {
-        if (!auth()->user()->hasRole('Administrateur') && $task->user_id !== auth()->id()) {
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && $task->user_id !== auth()->id()) {
             return response()->json(['error' => 'Vous n\'êtes pas autorisé à modifier cette tâche.'], 403);
         }
 

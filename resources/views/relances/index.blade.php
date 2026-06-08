@@ -136,21 +136,18 @@
 
             <!-- Filter Commercial (Admin only) -->
             <div class="flex items-end space-x-2">
+                @if(Auth::user()->hasRole('Administrateur'))
                 <div class="flex-1">
                     <label for="commercial_id" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Commercial</label>
                     <select name="commercial_id" id="commercial_id" 
-                            {{ !auth()->user()->hasRole('Administrateur') ? 'disabled' : '' }}
-                            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:opacity-50">
-                        @if(!auth()->user()->hasRole('Administrateur'))
-                            <option value="{{ auth()->id() }}" selected>{{ auth()->user()->name }}</option>
-                        @else
-                            <option value="">Tous les commerciaux</option>
-                            @foreach($commercials as $comm)
-                                <option value="{{ $comm->id }}" {{ request('commercial_id') == $comm->id ? 'selected' : '' }}>{{ $comm->name }}</option>
-                            @endforeach
-                        @endif
+                            class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                        <option value="">Tous les commerciaux</option>
+                        @foreach($commercials as $comm)
+                            <option value="{{ $comm->id }}" {{ request('commercial_id') == $comm->id ? 'selected' : '' }}>{{ $comm->name }}</option>
+                        @endforeach
                     </select>
                 </div>
+                @endif
                 <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-900 rounded-xl transition-all h-[38px] flex items-center justify-center">
                     Filtrer
                 </button>

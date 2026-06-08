@@ -67,8 +67,9 @@
                 </select>
             </div>
 
-            <!-- Filter Commercial -->
+            <!--Filter Commercial -->
             <div class="flex items-end space-x-2">
+                @if(Auth::user()->hasRole('Administrateur|Responsable Commercial|Directeur Général'))
                 <div class="flex-1">
                     <label for="commercial_id" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Commercial</label>
                     <select name="commercial_id" id="commercial_id" 
@@ -79,6 +80,7 @@
                         @endforeach
                     </select>
                 </div>
+                @endif
                 <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-900 rounded-xl transition-all h-[38px] flex items-center justify-center">
                     Filtrer
                 </button>

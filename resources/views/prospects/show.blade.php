@@ -26,6 +26,15 @@
                         </span>
                     </div>
                     <p class="text-sm text-slate-500 mt-1">{{ $prospect->entreprise ?? 'Aucune entreprise' }} • {{ $prospect->profession ?? 'Pas de profession renseignée' }}</p>
+                    @if($prospect->tags && count($prospect->tags) > 0)
+                        <div class="mt-2 flex flex-wrap gap-1.5">
+                            @foreach($prospect->tags as $tag)
+                                <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-md border border-slate-200">
+                                    {{ trim($tag) }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
             
@@ -49,6 +58,13 @@
                 <a href="{{ route('prospects.edit', $prospect) }}" class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl border border-indigo-200 transition-all">
                     Modifier
                 </a>
+                
+                @if($prospect->email)
+                <button type="button" onclick="document.getElementById('emailModal').classList.remove('hidden')" class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-slate-800 hover:bg-slate-900 rounded-xl shadow-md transition-all">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    Email
+                </button>
+                @endif
             </div>
         </div>
     </x-slot>
@@ -112,6 +128,56 @@
                             {{ $prospect->commentaire ?? 'Pas de commentaire.' }}
                         </p>
                     </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Documents Card -->
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Pièces Jointes & Documents</h3>
+                </div>
+                
+                <!-- Upload Form -->
+                <form action="{{ route('prospects.documents.store', $prospect) }}" method="POST" enctype="multipart/form-data" class="mb-4 flex flex-col md:flex-row md:items-center gap-3 bg-slate-50/50 p-3 rounded-xl border border-slate-100">
+                    @csrf
+                    <div class="flex-1">
+                        <input type="file" name="document" required class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                    </div>
+                    <button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-lg shadow-sm transition-all mt-2 md:mt-0">
+                        Uploader
+                    </button>
+                </form>
+                @error('document')
+                    <p class="text-xs text-rose-500 mt-1 mb-3">{{ $message }}</p>
+                @enderror
+
+                <!-- Documents List -->
+                <div class="space-y-2">
+                    @forelse($prospect->documents as $doc)
+                        <div class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-indigo-100 transition-colors group">
+                            <div class="flex items-center space-x-3 overflow-hidden">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                </div>
+                                <div class="truncate">
+                                    <a href="{{ Storage::url($doc->chemin_fichier) }}" target="_blank" class="text-xs font-semibold text-slate-700 hover:text-indigo-600 truncate block">
+                                        {{ $doc->nom_fichier }}
+                                    </a>
+                                    <span class="text-[10px] text-slate-400">
+                                        {{ round($doc->taille / 1024, 1) }} KB • {{ $doc->created_at->format('d/m/Y H:i') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <a href="{{ Storage::url($doc->chemin_fichier) }}" download class="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors tooltip" title="Télécharger">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </a>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-xs text-slate-400 italic text-center py-4 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">Aucun document attaché.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
@@ -193,6 +259,39 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    <!-- Email Modal -->
+    <div id="emailModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="text-sm font-bold text-slate-800">Envoyer un Email à {{ $prospect->prenom }} {{ $prospect->nom }}</h3>
+                <button type="button" onclick="document.getElementById('emailModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <form action="{{ route('prospects.email.send', $prospect) }}" method="POST" class="p-6">
+                @csrf
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-slate-700 mb-2">Destinataire</label>
+                    <input type="email" value="{{ $prospect->email }}" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-500 cursor-not-allowed">
+                </div>
+                <div class="mb-4">
+                    <label for="sujet" class="block text-xs font-semibold text-slate-700 mb-2">Sujet de l'email</label>
+                    <input type="text" name="sujet" id="sujet" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Ex: Suite à notre échange">
+                </div>
+                <div class="mb-6">
+                    <label for="message" class="block text-xs font-semibold text-slate-700 mb-2">Message</label>
+                    <textarea name="message" id="message" rows="6" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" placeholder="Bonjour {{ $prospect->prenom }}, ..."></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="document.getElementById('emailModal').classList.add('hidden')" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all">Annuler</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all shadow-md shadow-indigo-600/20 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        Envoyer
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </x-app-layout>

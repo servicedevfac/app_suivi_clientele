@@ -20,6 +20,10 @@ class ClientController extends Controller
     {
         $query = Client::with(['prospect', 'commercial', 'filiale']);
 
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $query->where('commercial_id', auth()->id());
+        }
+
         if ($request->filled('statut')) {
             $query->where('statut', $request->statut);
         }

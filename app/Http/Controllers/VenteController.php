@@ -21,6 +21,10 @@ class VenteController extends Controller
     {
         $query = Vente::with(['client', 'produit', 'commercial', 'filiale']);
 
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $query->where('commercial_id', auth()->id());
+        }
+
         if ($request->filled('statut')) {
             $query->where('statut', $request->statut);
         }
