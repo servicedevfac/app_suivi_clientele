@@ -150,7 +150,11 @@ class ProspectController extends Controller
         }
 
         $ancienStatut = $prospect->statut;
-        $nouveauStatut = $validated['statut'];
+        $nouveauStatut = $validated['statut'] ?? $ancienStatut;
+
+        if (in_array($ancienStatut, ['Gagné', 'Perdu']) && $ancienStatut !== $nouveauStatut) {
+            return redirect()->back()->with('error', 'Impossible de modifier le statut d\'un prospect déjà ' . $ancienStatut . '.');
+        }
 
         DB::transaction(function () use ($prospect, $validated, $ancienStatut, $nouveauStatut) {
             $prospect->update($validated);
@@ -248,6 +252,10 @@ class ProspectController extends Controller
 
         $ancienStatut = $prospect->statut;
         $nouveauStatut = $request->statut;
+
+        if (in_array($ancienStatut, ['Gagné', 'Perdu']) && $ancienStatut !== $nouveauStatut) {
+            return response()->json(['error' => 'Impossible de modifier le statut d\'un prospect déjà ' . $ancienStatut . '.'], 403);
+        }
 
         if ($ancienStatut !== $nouveauStatut) {
             DB::transaction(function () use ($prospect, $ancienStatut, $nouveauStatut) {

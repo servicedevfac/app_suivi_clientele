@@ -127,7 +127,7 @@
                     <!-- Statut -->
                     <div class="md:col-span-2">
                         <x-input-label for="statut" value="Statut" class="text-slate-700 font-semibold" />
-                        <select id="statut" name="statut" required class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm">
+                        <select id="statut" name="statut" required class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm" {{ in_array($prospect->statut, ['Gagné', 'Perdu']) ? 'disabled' : '' }}>
                             @foreach(['Nouveau', 'Contacté', 'Qualifié', 'En négociation', 'Gagné', 'Perdu'] as $st)
                                 <option value="{{ $st }}" {{ old('statut', $prospect->statut) === $st ? 'selected' : '' }}>{{ $st }}</option>
                             @endforeach

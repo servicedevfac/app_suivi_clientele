@@ -89,6 +89,10 @@ class ProspectController extends Controller
             return response()->json(['message' => 'Non autorisé'], 403);
         }
 
+        if (in_array($prospect->statut, ['Gagné', 'Perdu']) && $request->has('statut') && $request->statut !== $prospect->statut) {
+            return response()->json(['message' => 'Impossible de modifier le statut d\'un prospect déjà ' . $prospect->statut . '.'], 403);
+        }
+
         $validated = $request->validate([
             'entreprise' => 'nullable|string|max:255',
             'nom' => 'sometimes|required|string|max:255',

@@ -128,7 +128,7 @@ Route::middleware(['auth', 'user.status'])->group(function () {
     Route::resource('notifications', NotificationController::class)->only(['index', 'update']);
     Route::resource('prospects.histories', ProspectHistoryController::class)->only(['index']);
     
-    // Rapports et Objectifs
+    // Rapports et Objectif
     Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::resource('objectifs', \App\Http\Controllers\ObjectifController::class)->only(['index', 'store']);
 });
