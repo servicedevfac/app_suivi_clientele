@@ -237,9 +237,9 @@
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Prospect</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Entreprise & Poste</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Filiale</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Commercial</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Commentaire</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
                     </tr>
@@ -273,10 +273,7 @@
                                 </div>
                             </td>
                             <!-- Entreprise -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-slate-600 text-sm font-medium">{{ $prospect->entreprise ?? '—' }}</div>
-                                <div class="text-[10px] text-slate-400 mt-0.5">{{ $prospect->profession ?? '—' }}</div>
-                            </td>
+                         
                             <!-- Filiale -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg">
@@ -290,6 +287,14 @@
                                 @else
                                     <span class="text-slate-400 text-xs italic">Non assigné</span>
                                 @endif
+                            </td>
+                            <!-- Commentaire -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center space-x-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                        <span class="text-slate-600 text-xs">{{ $prospect->commentaire }}</span>
+                                    </div>
+                               
                             </td>
                             <!-- Statut Badge -->
                             <td class="px-6 py-4 whitespace-nowrap">

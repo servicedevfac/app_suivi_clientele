@@ -160,7 +160,7 @@
                                             <div class="text-xs text-slate-500">{{ $vente->produit->nom ?? 'Produit Inconnu' }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-sm font-bold text-emerald-600">
-                                            {{ number_format($vente->montant, 0, ',', ' ') }} €
+                                            {{ number_format($vente->montant, 0, ',', ' ') }} XOF
                                         </td>
                                         <td class="px-6 py-4 text-sm text-slate-600">
                                             {{ $vente->date_vente ? $vente->date_vente->format('d/m/Y') : $vente->created_at->format('d/m/Y') }}
@@ -190,7 +190,7 @@
                 data: {
                     labels: {!! json_encode($stats['chart_ventes_labels']) !!},
                     datasets: [{
-                        label: 'Chiffre d\'Affaires (€)',
+                        label: 'Chiffre d\'Affaires (XOF)',
                         data: {!! json_encode($stats['chart_ventes_data']) !!},
                         borderColor: '#4f46e5',
                         backgroundColor: 'rgba(79, 70, 229, 0.1)',
@@ -213,12 +213,12 @@
             // Graphique des Prospects
             const ctxProspects = document.getElementById('prospectsChart').getContext('2d');
             new Chart(ctxProspects, {
-                type: 'doughnut',
+                type: 'pie',
                 data: {
                     labels: {!! json_encode($stats['chart_prospects_labels']) !!},
                     datasets: [{
                         data: {!! json_encode($stats['chart_prospects_data']) !!},
-                        backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#64748b', '#ef4444'],
+                        backgroundColor: ['#3b82f6', '#10b981','#f59e0b', '#64748b', '#ef4444'],
                         borderWidth: 0
                     }]
                 },
@@ -228,7 +228,7 @@
                     plugins: {
                         legend: { position: 'bottom' }
                     },
-                    cutout: '70%'
+                    cutout: '10%'
                 }
             });
         });

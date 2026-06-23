@@ -50,7 +50,7 @@ class ClientController extends Controller
         $clients = $query->latest()->paginate(10)->withQueryString();
 
         $filiales = Filiale::all();
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
 
         return view('clients.index', compact('clients', 'filiales', 'commercials'));
     }
@@ -60,7 +60,7 @@ class ClientController extends Controller
      */
     public function create()
     {
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
         $filiales = Filiale::all();
         // Only load prospects that haven't been converted to clients yet
         $prospects = Prospect::whereDoesntHave('client')->get();
@@ -73,7 +73,15 @@ class ClientController extends Controller
      */
     public function store(StoreClientRequest $request)
     {
-        $client = Client::create($request->validated());
+        $validated = $request->validated();
+        $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner un client à ce collaborateur.");
+        }
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $validated['commercial_id'] = auth()->id();
+        }
+        $client = Client::create($validated);
 
         ActivityLog::log('Création client', 'Clients', "Création du client {$client->nom} {$client->prenom}.");
 
@@ -95,7 +103,7 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
         $filiales = Filiale::all();
         // Load prospects that are either not converted or are the one associated with this client
         $prospects = Prospect::whereDoesntHave('client')
@@ -110,7 +118,15 @@ class ClientController extends Controller
      */
     public function update(UpdateClientRequest $request, Client $client)
     {
-        $client->update($request->validated());
+        $validated = $request->validated();
+        $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner un client à ce collaborateur.");
+        }
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $validated['commercial_id'] = auth()->id();
+        }
+        $client->update($validated);
 
         ActivityLog::log('Modification client', 'Clients', "Modification du client {$client->nom} {$client->prenom}.");
 

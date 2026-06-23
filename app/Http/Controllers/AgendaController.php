@@ -31,7 +31,7 @@ class AgendaController extends Controller
 
         // Format Tasks
         foreach ($tasks as $task) {
-            if ($task->date_echeance) {
+            if ($task->date_limite) {
                 $color = match($task->priorite) {
                     'Haute' => '#ef4444', // red-500
                     'Moyenne' => '#f59e0b', // amber-500
@@ -42,7 +42,7 @@ class AgendaController extends Controller
                 $events[] = [
                     'id' => 'task_' . $task->id,
                     'title' => '[Tâche] ' . $task->titre,
-                    'start' => $task->date_echeance->format('Y-m-d'),
+                    'start' => $task->date_limite->format('Y-m-d'),
                     'url' => route('tasks.show', $task->id),
                     'color' => $color,
                     'textColor' => '#ffffff',

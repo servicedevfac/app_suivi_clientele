@@ -23,10 +23,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/prospect/{prospect}/convert', [ProspectController::class, 'convertToClient']);
     Route::apiResource('client', ClientController::class)->only(['index', 'show']);
     
-    Route::apiResource('tasks', TaskController::class);
-    Route::apiResource('relances', RelanceController::class);
+    Route::apiResource('task', TaskController::class);
+    Route::apiResource('relance', RelanceController::class);
     
-    // Legacy Agenda endpoint if needed
-    Route::get('/agenda', [AgendaController::class, 'index']);
-    Route::put('/agenda/{relance}/statut', [AgendaController::class, 'updateStatus']);
+    Route::get('/agendas', [AgendaController::class, 'index']);
+    Route::put('/agendas/{relance}/statut', [AgendaController::class, 'updateStatus']);
 });

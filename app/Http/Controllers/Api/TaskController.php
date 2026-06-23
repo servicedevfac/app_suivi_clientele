@@ -48,7 +48,12 @@ class TaskController extends Controller
             'user_id' => 'nullable|exists:users,id',
         ]);
 
-        if (empty($validated['user_id'])) {
+        if ($request->user()->hasRole('Commercial')) {
+            if (!empty($validated['user_id']) && $validated['user_id'] != $request->user()->id) {
+                return response()->json(['message' => 'Non autorisé à assigner un autre utilisateur'], 403);
+            }
+            $validated['user_id'] = $request->user()->id;
+        } elseif (empty($validated['user_id'])) {
             $validated['user_id'] = $request->user()->id;
         }
 
@@ -74,6 +79,13 @@ class TaskController extends Controller
             'statut' => 'sometimes|required|in:À faire,En cours,Terminée',
             'user_id' => 'nullable|exists:users,id',
         ]);
+
+        if ($user->hasRole('Commercial') && isset($validated['user_id'])) {
+            if ($validated['user_id'] != $user->id) {
+                return response()->json(['message' => 'Non autorisé à assigner un autre utilisateur'], 403);
+            }
+            $validated['user_id'] = $user->id;
+        }
 
         $task->update($validated);
 

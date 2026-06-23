@@ -90,10 +90,9 @@
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-100">
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Entreprise</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Filiale</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Commercial</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Date de conversion</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Date de conversion</th>                       
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
                     </tr>
@@ -116,10 +115,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </td>
-                            <!-- Entreprise -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-slate-600 text-sm font-medium">{{ $client->entreprise ?? '—' }}</div>
                             </td>
                             <!-- Filiale -->
                             <td class="px-6 py-4 whitespace-nowrap">

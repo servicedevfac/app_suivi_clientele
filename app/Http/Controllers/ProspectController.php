@@ -60,7 +60,7 @@ class ProspectController extends Controller
         }
 
         $filiales = Filiale::all();
-        $commercials = User::all(); // All users can act as commercial/assignee in this context
+        $commercials = User::getAssignableUsers();
 
         return view('prospects.index', compact('prospects', 'filiales', 'commercials'));
     }
@@ -70,7 +70,7 @@ class ProspectController extends Controller
      */
     public function create()
     {
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
         $filiales = Filiale::all();
         $sources = Source::all();
         $campagnes = Campagne::all();
@@ -84,6 +84,15 @@ class ProspectController extends Controller
     public function store(StoreProspectRequest $request)
     {
         $validated = $request->validated();
+
+        $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner un prospect à ce collaborateur.");
+        }
+
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $validated['commercial_id'] = auth()->id();
+        }
 
         if (isset($validated['tags']) && is_string($validated['tags'])) {
             $tagsArray = array_filter(array_map('trim', explode(',', $validated['tags'])));
@@ -127,7 +136,7 @@ class ProspectController extends Controller
      */
     public function edit(Prospect $prospect)
     {
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
         $filiales = Filiale::all();
         $sources = Source::all();
         $campagnes = Campagne::all();
@@ -142,6 +151,15 @@ class ProspectController extends Controller
     {
         $validated = $request->validated();
         
+        $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner un prospect à ce collaborateur.");
+        }
+
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $validated['commercial_id'] = auth()->id();
+        }
+
         if (isset($validated['tags']) && is_string($validated['tags'])) {
             $tagsArray = array_filter(array_map('trim', explode(',', $validated['tags'])));
             $validated['tags'] = array_values($tagsArray);

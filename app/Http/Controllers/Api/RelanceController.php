@@ -35,7 +35,12 @@ class RelanceController extends Controller
             'commercial_id' => 'nullable|exists:users,id',
         ]);
 
-        if (empty($validated['commercial_id'])) {
+        if ($request->user()->hasRole('Commercial')) {
+            if (!empty($validated['commercial_id']) && $validated['commercial_id'] != $request->user()->id) {
+                return response()->json(['message' => 'Non autorisé à assigner un autre utilisateur'], 403);
+            }
+            $validated['commercial_id'] = $request->user()->id;
+        } elseif (empty($validated['commercial_id'])) {
             $validated['commercial_id'] = $request->user()->id;
         }
 
@@ -61,6 +66,13 @@ class RelanceController extends Controller
             'statut' => 'sometimes|required|in:En attente,Effectuée,Annulée',
             'commercial_id' => 'nullable|exists:users,id',
         ]);
+
+        if ($user->hasRole('Commercial') && isset($validated['commercial_id'])) {
+            if ($validated['commercial_id'] != $user->id) {
+                return response()->json(['message' => 'Non autorisé à assigner un autre utilisateur'], 403);
+            }
+            $validated['commercial_id'] = $user->id;
+        }
 
         $relance->update($validated);
 

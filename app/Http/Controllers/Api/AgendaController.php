@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Relance;
+use App\Models\Task;
 use Carbon\Carbon;
 
 class AgendaController extends Controller
@@ -12,17 +13,26 @@ class AgendaController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $query = Relance::query();
+        $queryRelances = Relance::query();
+        $queryTasks = Task::query();
 
         if ($user->hasRole('Commercial')) {
-            $query->where('commercial_id', $user->id);
+            $queryRelances->where('commercial_id', $user->id);
+            $queryTasks->where('user_id', $user->id);
         }
 
-        $relances = $query->with('prospect')
+        $relances = $queryRelances->with('prospect')
             ->orderBy('date_relance', 'asc')
             ->get();
 
-        return response()->json($relances);
+        $tasks = $queryTasks->with('prospect')
+            ->orderBy('date_limite', 'asc')
+            ->get();
+
+        return response()->json([
+            'relances' => $relances,
+            'tasks' => $tasks,
+        ]);
     }
 
     public function updateStatus(Request $request, Relance $relance)

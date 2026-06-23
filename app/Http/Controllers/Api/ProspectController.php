@@ -24,13 +24,20 @@ class ProspectController extends Controller
         return response()->json($prospects);
     }
 
-    public function formOptions()
+    public function formOptions(Request $request)
     {
+        $user = $request->user();
+        if ($user && $user->hasRole('Commercial')) {
+            $commercials = \App\Models\User::where('id', $user->id)->get(['id', 'name']);
+        } else {
+            $commercials = \App\Models\User::role('Commercial')->get(['id', 'name']);
+        }
+
         return response()->json([
             'sources' => \App\Models\Source::all(),
             'filiales' => \App\Models\Filiale::all(),
             'campagnes' => \App\Models\Campagne::all(),
-            'commercials' => \App\Models\User::role('Commercial')->get(['id', 'name']),
+            'commercials' => $commercials,
         ]);
     }
 
@@ -72,7 +79,12 @@ class ProspectController extends Controller
             'prochain_rappel' => 'nullable|date',
         ]);
 
-        if (empty($validated['commercial_id'])) {
+        if ($request->user()->hasRole('Commercial')) {
+            if (!empty($validated['commercial_id']) && $validated['commercial_id'] != $request->user()->id) {
+                return response()->json(['message' => 'Non autorisé à assigner un autre utilisateur'], 403);
+            }
+            $validated['commercial_id'] = $request->user()->id;
+        } elseif (empty($validated['commercial_id'])) {
             $validated['commercial_id'] = $request->user()->id;
         }
 
@@ -115,6 +127,13 @@ class ProspectController extends Controller
             'tags' => 'nullable|string',
             'prochain_rappel' => 'nullable|date',
         ]);
+
+        if ($user->hasRole('Commercial') && isset($validated['commercial_id'])) {
+            if ($validated['commercial_id'] != $user->id) {
+                return response()->json(['message' => 'Non autorisé à assigner un autre utilisateur'], 403);
+            }
+            $validated['commercial_id'] = $user->id;
+        }
 
         $prospect->update($validated);
 

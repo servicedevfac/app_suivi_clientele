@@ -49,7 +49,7 @@ class VenteController extends Controller
         $ventes = $query->latest()->paginate(10)->withQueryString();
 
         $filiales = Filiale::all();
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
 
         return view('ventes.index', compact('ventes', 'filiales', 'commercials'));
     }
@@ -61,7 +61,7 @@ class VenteController extends Controller
     {
         $clients = Client::where('statut', 'Actif')->get();
         $produits = Produit::all();
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
         $filiales = Filiale::all();
 
         return view('ventes.create', compact('clients', 'produits', 'commercials', 'filiales'));
@@ -80,6 +80,14 @@ class VenteController extends Controller
         $montantCalculer = ($produit->prix * $validated['quantite']) - $reduction;
         
         $validated['montant'] = max(0, $montantCalculer);
+
+        $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner une vente à ce collaborateur.");
+        }
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $validated['commercial_id'] = auth()->id();
+        }
 
         $vente = Vente::create($validated);
 
@@ -109,7 +117,7 @@ class VenteController extends Controller
 
         $clients = Client::all();
         $produits = Produit::all();
-        $commercials = User::all();
+        $commercials = User::getAssignableUsers();
         $filiales = Filiale::all();
 
         return view('ventes.edit', compact('vente', 'clients', 'produits', 'commercials', 'filiales'));
@@ -133,6 +141,14 @@ class VenteController extends Controller
         $montantCalculer = ($produit->prix * $validated['quantite']) - $reduction;
 
         $validated['montant'] = max(0, $montantCalculer);
+
+        $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
+        if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
+            abort(403, "Vous ne pouvez pas assigner une vente à ce collaborateur.");
+        }
+        if (!auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général')) {
+            $validated['commercial_id'] = auth()->id();
+        }
 
         $vente->update($validated);
 

@@ -165,10 +165,10 @@
                 </x-sidebar-link>
             </div>
             @endrole
-            <!-- SECTION : CONFIGURATION / ADMIN -->
+          @role('Administrateur|Directeur Général')
             <div class="space-y-1">
                 <span class="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">Configuration</span>
-                @role('Administrateur|Directeur Général')
+             
                 <x-sidebar-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +187,7 @@
                     </x-slot>
                     Filiales
                 </x-sidebar-link>
-                @endrole
+               
                 @if(Auth::user()->hasRole('Administrateur'))
                 <x-sidebar-link :href="route('logs.index')" :active="request()->routeIs('logs.*')">
                     <x-slot name="icon">
@@ -198,7 +198,7 @@
                     Journaux d'Audit
                 </x-sidebar-link>
                 @endif
-            </div>
+            </div> @endrole
         </nav>
 
         <!-- Bas de la Sidebar (Profil de l'utilisateur) -->
