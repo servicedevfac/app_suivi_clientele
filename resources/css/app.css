@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Masquer les barres de défilement tout en gardant la possibilité de scroller */
+::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent; /* Masquer complètement la barre sur webkit */
+}
+
+/* Pour Firefox */
+* {
+    scrollbar-width: none; 
+}
