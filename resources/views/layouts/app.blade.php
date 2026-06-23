@@ -14,6 +14,19 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        
+        <!-- Hide Scrollbars Globally -->
+        <style>
+            /* Masquer les barres de défilement tout en gardant la possibilité de scroller */
+            ::-webkit-scrollbar {
+                width: 0px;
+                height: 0px;
+                background: transparent;
+            }
+            * {
+                scrollbar-width: none; 
+            }
+        </style>
     </head>
     <body class="font-sans antialiased bg-slate-50 text-slate-800" style="font-family: 'Plus Jakarta Sans', sans-serif;">
         <div x-data="{ sidebarOpen: false }" class="flex h-screen overflow-hidden bg-slate-50">

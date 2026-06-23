@@ -56,8 +56,8 @@
                         window.open(info.event.url, '_blank'); // open in new tab
                     }
                 },
-                height: 700,
-                contentHeight: 650,
+                height: 'auto',
+                contentHeight: 'auto',
                 themeSystem: 'standard'
             });
 
@@ -66,17 +66,61 @@
     </script>
     
     <style>
-        /* Customizing FullCalendar to match CRM aesthetics */
-        .fc .fc-toolbar-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
-        .fc .fc-button-primary { background-color: #4f46e5; border-color: #4f46e5; border-radius: 0.5rem; text-transform: capitalize; }
-        .fc .fc-button-primary:hover { background-color: #4338ca; border-color: #4338ca; }
-        .fc .fc-button-primary:disabled { background-color: #c7d2fe; border-color: #c7d2fe; }
-        .fc .fc-button-active { background-color: #3730a3 !important; border-color: #3730a3 !important; }
-        .fc-theme-standard th { background-color: #f8fafc; padding: 0.5rem; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600; border-color: #f1f5f9; }
+        /* Customizing FullCalendar to match a premium CRM aesthetics */
+        .fc { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        /* Toolbar */
+        .fc .fc-toolbar-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; letter-spacing: -0.025em; }
+        .fc .fc-button-primary { 
+            background-color: #ffffff; 
+            border: 1px solid #e2e8f0; 
+            color: #475569; 
+            border-radius: 0.75rem; 
+            text-transform: capitalize; 
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        .fc .fc-button-primary:hover { background-color: #f8fafc; border-color: #cbd5e1; color: #0f172a; }
+        .fc .fc-button-primary:disabled { background-color: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; }
+        .fc .fc-button-active { 
+            background-color: #4f46e5 !important; 
+            border-color: #4f46e5 !important; 
+            color: white !important;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2), 0 2px 4px -1px rgba(79, 70, 229, 0.1) !important;
+        }
+        
+        /* Headers and Grid */
+        .fc-theme-standard th { background-color: #f8fafc; padding: 0.75rem; font-size: 0.8rem; text-transform: uppercase; color: #64748b; font-weight: 700; border: none; border-bottom: 1px solid #f1f5f9; }
         .fc-theme-standard td, .fc-theme-standard th { border-color: #f1f5f9; }
-        .fc .fc-daygrid-day-number { color: #475569; font-size: 0.875rem; font-weight: 500; }
-        .fc-event { border: none; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; padding: 0.125rem 0.25rem; margin-bottom: 0.125rem; cursor: pointer; transition: opacity 0.2s; }
-        .fc-event:hover { opacity: 0.9; }
+        .fc .fc-daygrid-day-number { color: #334155; font-size: 0.875rem; font-weight: 600; padding: 0.5rem; }
+        .fc .fc-day-today { background-color: #fefce8 !important; } /* Soft yellow for today */
+        
+        /* Events */
+        .fc-event { 
+            border: none; 
+            border-radius: 0.5rem; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            padding: 0.25rem 0.5rem; 
+            margin: 0.125rem 0.25rem; 
+            cursor: pointer; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .fc-event:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 5;
+        }
         .fc-h-event .fc-event-main { color: inherit; }
+        
+        /* List view */
+        .fc-list-day-cushion { background-color: #f8fafc !important; }
+        .fc-list-event:hover td { background-color: #f1f5f9 !important; }
+        
+        /* Hide outline on focus */
+        .fc .fc-button:focus { box-shadow: none !important; outline: 2px solid #818cf8; outline-offset: 2px; }
     </style>
 </x-app-layout>
