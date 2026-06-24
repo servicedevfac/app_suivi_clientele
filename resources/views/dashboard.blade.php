@@ -45,7 +45,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">Ventes du mois</p>
-                            <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['ventes_mois_sum'], 0, ',', ' ') }} €</p>
+                            <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['ventes_mois_sum'], 0, ',', ' ') }} XOF</p>
                         </div>
                     </div>
                     @if($stats['objectif_mois'])
@@ -55,7 +55,7 @@
                         <div class="w-full bg-slate-100 rounded-full h-2 mt-2">
                             <div class="bg-emerald-500 h-2 rounded-full" style="width: {{ $progress }}%"></div>
                         </div>
-                        <p class="text-xs text-slate-500 text-right mt-1">Objectif : {{ number_format($stats['objectif_mois'], 0, ',', ' ') }} € ({{ $progress }}%)</p>
+                        <p class="text-xs text-slate-500 text-right mt-1">Objectif : {{ number_format($stats['objectif_mois'], 0, ',', ' ') }} XOF ({{ $progress }}%)</p>
                     @endif
                 </div>
 
@@ -68,7 +68,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-slate-500 uppercase tracking-wider">CA Prévisionnel</p>
-                        <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['ca_previsionnel'], 0, ',', ' ') }} €</p>
+                        <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['ca_previsionnel'], 0, ',', ' ') }} XOF</p>
                     </div>
                 </div>
             </div>

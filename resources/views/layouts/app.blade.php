@@ -15,15 +15,14 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
-        <!-- Hide Scrollbars Globally -->
+        <!-- Hide Scrollbars for Sidebar only -->
         <style>
-            /* Masquer les barres de défilement tout en gardant la possibilité de scroller */
-            ::-webkit-scrollbar {
+            /* Masquer la barre de défilement uniquement pour la sidebar */
+            .custom-scrollbar::-webkit-scrollbar {
                 width: 0px;
-                height: 0px;
                 background: transparent;
             }
-            * {
+            .custom-scrollbar {
                 scrollbar-width: none; 
             }
         </style>
