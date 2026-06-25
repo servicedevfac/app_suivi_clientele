@@ -411,7 +411,7 @@
     @endif
 
     <!-- Dynamic JavaScript scripts -->
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         // Synchroniser localStorage avec l'URL au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);

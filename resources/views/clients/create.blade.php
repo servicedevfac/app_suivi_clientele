@@ -168,7 +168,7 @@
     </div>
 
     <!-- JavaScript Auto-fill Script -->
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         document.getElementById('prospect_id').addEventListener('change', function() {
             const option = this.options[this.selectedIndex];
             if (option.value) {

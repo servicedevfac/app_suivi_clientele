@@ -85,8 +85,8 @@
             </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" nonce="{{ Vite::cspNonce() }}"></script>
+    <script nonce="{{ Vite::cspNonce() }}">
         document.addEventListener('DOMContentLoaded', function() {
             const ctx = document.getElementById('conversionChart').getContext('2d');
             

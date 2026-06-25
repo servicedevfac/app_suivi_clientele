@@ -175,8 +175,8 @@
         </div>
 
         @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-        <script>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js" nonce="{{ Vite::cspNonce() }}"></script>
+        <script nonce="{{ Vite::cspNonce() }}">
             document.addEventListener('DOMContentLoaded', function () {
                 const lists = document.querySelectorAll('.sortable-list');
                 

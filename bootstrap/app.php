@@ -12,8 +12,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Middleware global — appliqué à TOUTES les requêtes (web, api, 404, etc.)
+        $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
+
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\CheckUserStatus::class,
         ]);
         $middleware->alias([

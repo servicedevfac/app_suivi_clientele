@@ -6,8 +6,8 @@
 
     <!-- FullCalendar JS/CSS -->
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js' nonce="{{ Vite::cspNonce() }}"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/fr.js' nonce="{{ Vite::cspNonce() }}"></script>
 
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mb-6">
         <div class="flex justify-end space-x-4 mb-4">
@@ -31,7 +31,7 @@
         <div id='calendar' class="w-full text-slate-800"></div>
     </div>
 
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var events = @json($events);
@@ -65,7 +65,7 @@
         });
     </script>
     
-    <style>
+    <style nonce="{{ Vite::cspNonce() }}">
         /* Customizing FullCalendar to match a premium CRM aesthetics */
         .fc { font-family: 'Plus Jakarta Sans', sans-serif; }
         
