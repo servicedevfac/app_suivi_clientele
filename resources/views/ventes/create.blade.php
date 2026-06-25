@@ -156,7 +156,7 @@
     </div>
 
     <!-- JavaScript Auto fill & calculator -->
-    <script>
+    <script nonce="{{ Vite::cspNonce() }}">
         function calculateAmount() {
             const productSelect = document.getElementById('produit_id');
             const qtyInput = document.getElementById('quantite');

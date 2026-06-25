@@ -16,7 +16,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         
         <!-- Hide Scrollbars for Sidebar only -->
-        <style>
+        <style nonce="{{ Vite::cspNonce() }}">
             /* Masquer la barre de défilement uniquement pour la sidebar */
             .custom-scrollbar::-webkit-scrollbar {
                 width: 0px;
