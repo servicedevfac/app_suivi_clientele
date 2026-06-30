@@ -61,8 +61,10 @@ class ProspectController extends Controller
 
         $filiales = Filiale::all();
         $commercials = User::getAssignableUsers();
+        $sources = Source::all();
+        $campagnes = Campagne::all();
 
-        return view('prospects.index', compact('prospects', 'filiales', 'commercials'));
+        return view('prospects.index', compact('prospects', 'filiales', 'commercials', 'sources', 'campagnes'));
     }
 
     /**
@@ -399,6 +401,8 @@ class ProspectController extends Controller
         $request->validate([
             'csv_file' => 'required|file|max:10240',
             'filiale_id' => 'required|exists:filiales,id',
+            'source_id' => 'nullable|exists:sources,id',
+            'campagne_id' => 'nullable|exists:campagnes,id',
         ]);
 
         $file = $request->file('csv_file');
@@ -419,6 +423,9 @@ class ProspectController extends Controller
         $prenomColIdx = 1;
         $emailColIdx = 2;
         $entrepriseColIdx = 4;
+        $commentaireColIdx = 5;
+        $sourceColIdx = -1;
+        $campagneColIdx = -1;
 
         // Si le fichier contient plusieurs colonnes ou une ligne d'en-tête
         if (count($headerRow) > 1 || preg_match('/nom|t[eé]l|mail|phone|num/i', (string) ($headerRow[0] ?? ''))) {
@@ -435,6 +442,12 @@ class ProspectController extends Controller
                     $emailColIdx = $idx;
                 } elseif (preg_match('/entr|soc|comp/i', $t)) {
                     $entrepriseColIdx = $idx;
+                } elseif (preg_match('/comm|note|desc|besoin|obs|rem/i', $t)) {
+                    $commentaireColIdx = $idx;
+                } elseif (preg_match('/source|orig/i', $t)) {
+                    $sourceColIdx = $idx;
+                } elseif (preg_match('/camp/i', $t)) {
+                    $campagneColIdx = $idx;
                 }
             }
             array_shift($rows); // Ignorer l'en-tête
@@ -454,14 +467,35 @@ class ProspectController extends Controller
                     $nom = 'Inconnu (' . $phone . ')';
                 }
 
+                $sourceId = $request->source_id ?: null;
+                if ($sourceColIdx !== -1 && isset($data[$sourceColIdx]) && !empty(trim((string) $data[$sourceColIdx]))) {
+                    $val = trim((string) $data[$sourceColIdx]);
+                    $foundSource = Source::where('nom', 'like', $val)->orWhere('id', $val)->first();
+                    if ($foundSource) {
+                        $sourceId = $foundSource->id;
+                    }
+                }
+
+                $campagneId = $request->campagne_id ?: null;
+                if ($campagneColIdx !== -1 && isset($data[$campagneColIdx]) && !empty(trim((string) $data[$campagneColIdx]))) {
+                    $val = trim((string) $data[$campagneColIdx]);
+                    $foundCamp = Campagne::where('nom', 'like', $val)->orWhere('id', $val)->first();
+                    if ($foundCamp) {
+                        $campagneId = $foundCamp->id;
+                    }
+                }
+
                 Prospect::create([
                     'nom' => $nom,
                     'prenom' => isset($data[$prenomColIdx]) && $prenomColIdx !== $phoneColIdx ? trim((string) $data[$prenomColIdx]) ?: null : null,
                     'email' => isset($data[$emailColIdx]) && $emailColIdx !== $phoneColIdx ? trim((string) $data[$emailColIdx]) ?: null : null,
                     'telephone' => $phone,
                     'entreprise' => isset($data[$entrepriseColIdx]) && $entrepriseColIdx !== $phoneColIdx ? trim((string) $data[$entrepriseColIdx]) ?: null : null,
-                    'statut' => 'Nouveau',
+                    'statut' => 'Nouveau',                   
+                    'commentaire' => isset($data[$commentaireColIdx]) && $commentaireColIdx !== $phoneColIdx ? trim((string) $data[$commentaireColIdx]) ?: null : null,
                     'filiale_id' => $request->filiale_id,
+                    'source_id' => $sourceId,
+                    'campagne_id' => $campagneId,
                     'commercial_id' => auth()->id(),
                 ]);
                 $count++;
