@@ -389,9 +389,9 @@
             <form action="{{ route('prospects.import') }}" method="POST" enctype="multipart/form-data" class="p-6">
                 @csrf
                 <div class="mb-4">
-                    <label class="block text-xs font-semibold text-slate-700 mb-2">Fichier CSV</label>
-                    <input type="file" name="csv_file" required accept=".csv" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border border-slate-200 rounded-xl">
-                    <p class="text-[10px] text-slate-500 mt-2">Format attendu: Nom, Prénom, Email, Téléphone, Entreprise. Séparateur: point-virgule (;).</p>
+                    <label class="block text-xs font-semibold text-slate-700 mb-2">Fichier (Excel ou CSV)</label>
+                    <input type="file" name="csv_file" required accept=".xlsx,.xls,.csv,.txt" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer border border-slate-200 rounded-xl">
+                    <p class="text-[10px] text-slate-500 mt-2">Formats acceptés : Excel (.xlsx) ou CSV. <strong class="text-rose-600 font-semibold">Seul le numéro de téléphone est obligatoire</strong> (Nom, Email, etc. facultatifs).</p>
                 </div>
                 <div class="mb-6">
                     <label for="import_filiale_id" class="block text-xs font-semibold text-slate-700 mb-2">Filiale par défaut</label>

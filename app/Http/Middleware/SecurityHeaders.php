@@ -40,8 +40,8 @@ class SecurityHeaders
         // Utilisation de nonces au lieu de 'unsafe-inline' pour les scripts et styles
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'nonce-{$nonce}' https://cdn.jsdelivr.net",
-            "style-src 'self' 'nonce-{$nonce}' 'unsafe-hashes' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
             "img-src 'self' data:",
             "font-src 'self' data: https://fonts.gstatic.com",
             "connect-src 'self'",

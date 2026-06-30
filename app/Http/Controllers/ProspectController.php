@@ -84,6 +84,9 @@ class ProspectController extends Controller
     public function store(StoreProspectRequest $request)
     {
         $validated = $request->validated();
+        if (empty($validated['nom'])) {
+            $validated['nom'] = 'Inconnu (' . ($validated['telephone'] ?? 'Sans numéro') . ')';
+        }
 
         $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
         if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
@@ -150,6 +153,9 @@ class ProspectController extends Controller
     public function update(UpdateProspectRequest $request, Prospect $prospect)
     {
         $validated = $request->validated();
+        if (empty($validated['nom'])) {
+            $validated['nom'] = 'Inconnu (' . ($validated['telephone'] ?? 'Sans numéro') . ')';
+        }
         
         $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
         if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
@@ -360,102 +366,113 @@ class ProspectController extends Controller
         }
 
         $prospects = $query->get();
-        $filename = "prospects_export_" . date('Y-m-d_H-i-s') . ".csv";
-        $headers = [
-            "Content-type"        => "text/csv; charset=UTF-8",
-            "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
-
+        $filename = "prospects_export_" . date('Y-m-d_H-i-s') . ".xlsx";
         $columns = ['ID', 'Nom', 'Prénom', 'Email', 'Téléphone', 'Entreprise', 'Profession', 'Filiale', 'Commercial', 'Source', 'Campagne', 'Statut', 'Date Création'];
 
-        $callback = function() use($prospects, $columns) {
-            $file = fopen('php://output', 'w');
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM for Excel
-            fputcsv($file, $columns, ';');
+        $rows = [];
+        foreach ($prospects as $prospect) {
+            $rows[] = [
+                $prospect->id,
+                $prospect->nom,
+                $prospect->prenom,
+                $prospect->email,
+                $prospect->telephone,
+                $prospect->entreprise,
+                $prospect->profession,
+                $prospect->filiale ? $prospect->filiale->nom : '',
+                $prospect->commercial ? $prospect->commercial->name : '',
+                $prospect->source ? $prospect->source->nom : '',
+                $prospect->campagne ? $prospect->campagne->nom : '',
+                $prospect->statut,
+                $prospect->created_at->format('d/m/Y')
+            ];
+        }
 
-            foreach ($prospects as $prospect) {
-                fputcsv($file, [
-                    $prospect->id,
-                    $prospect->nom,
-                    $prospect->prenom,
-                    $prospect->email,
-                    $prospect->telephone,
-                    $prospect->entreprise,
-                    $prospect->profession,
-                    $prospect->filiale ? $prospect->filiale->nom : '',
-                    $prospect->commercial ? $prospect->commercial->name : '',
-                    $prospect->source ? $prospect->source->nom : '',
-                    $prospect->campagne ? $prospect->campagne->nom : '',
-                    $prospect->statut,
-                    $prospect->created_at->format('d/m/Y')
-                ], ';');
-            }
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return \App\Support\SimpleExcel::export($filename, $columns, $rows);
     }
 
     /**
-     * Import prospects from CSV.
+     * Import prospects from Excel (.xlsx) or CSV.
      */
     public function import(Request $request)
     {
         $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt|max:10240',
+            'csv_file' => 'required|file|max:10240',
             'filiale_id' => 'required|exists:filiales,id',
         ]);
 
         $file = $request->file('csv_file');
-        $handle = fopen($file->getRealPath(), "r");
-        
-        // Detect BOM and remove it if present
-        $bom = fread($handle, 3);
-        if ($bom !== "\xEF\xBB\xBF") {
-            rewind($handle);
+
+        try {
+            $rows = \App\Support\SimpleExcel::import($file->getRealPath(), $file->getClientOriginalName());
+        } catch (\Exception $e) {
+            return back()->with('error', "Erreur lors de la lecture du fichier : " . $e->getMessage());
         }
 
-        // Try to read first line to detect separator (; or ,)
-        $firstLine = fgets($handle);
-        $separator = strpos($firstLine, ';') !== false ? ';' : ',';
-        rewind($handle);
-        if ($bom === "\xEF\xBB\xBF") {
-            fread($handle, 3); // Skip BOM again
+        if (empty($rows) || count($rows) < 1) {
+            return back()->with('error', "Le document importé est vide.");
         }
-        
-        // Skip header
-        fgetcsv($handle, 1000, $separator);
-        
+
+        $headerRow = $rows[0];
+        $phoneColIdx = 0; // Par défaut colonne 0 si une seule colonne
+        $nomColIdx = 0;
+        $prenomColIdx = 1;
+        $emailColIdx = 2;
+        $entrepriseColIdx = 4;
+
+        // Si le fichier contient plusieurs colonnes ou une ligne d'en-tête
+        if (count($headerRow) > 1 || preg_match('/nom|t[eé]l|mail|phone|num/i', (string) ($headerRow[0] ?? ''))) {
+            $phoneColIdx = 3; // défaut standard
+            foreach ($headerRow as $idx => $colTitle) {
+                $t = strtolower(trim((string) $colTitle));
+                if (preg_match('/t[eé]l|phone|mob|num/i', $t)) {
+                    $phoneColIdx = $idx;
+                } elseif (preg_match('/pr[eé]nom/i', $t)) {
+                    $prenomColIdx = $idx;
+                } elseif (preg_match('/^nom|name/i', $t) && !preg_match('/pr[eé]nom/i', $t)) {
+                    $nomColIdx = $idx;
+                } elseif (preg_match('/mail/i', $t)) {
+                    $emailColIdx = $idx;
+                } elseif (preg_match('/entr|soc|comp/i', $t)) {
+                    $entrepriseColIdx = $idx;
+                }
+            }
+            array_shift($rows); // Ignorer l'en-tête
+        }
+
         $count = 0;
         DB::beginTransaction();
         try {
-            while (($data = fgetcsv($handle, 1000, $separator)) !== FALSE) {
-                if (count($data) >= 1 && !empty($data[0])) { // Nom is required
-                    Prospect::create([
-                        'nom' => $data[0] ?? 'Inconnu',
-                        'prenom' => $data[1] ?? null,
-                        'email' => $data[2] ?? null,
-                        'telephone' => $data[3] ?? null,
-                        'entreprise' => $data[4] ?? null,
-                        'statut' => 'Nouveau',
-                        'filiale_id' => $request->filiale_id,
-                        'commercial_id' => auth()->id(),
-                    ]);
-                    $count++;
+            foreach ($rows as $data) {
+                $phone = isset($data[$phoneColIdx]) ? trim((string) $data[$phoneColIdx]) : '';
+                if (empty($phone)) {
+                    continue; // Seul le numéro de téléphone est obligatoire !
                 }
+
+                $nom = isset($data[$nomColIdx]) && $nomColIdx !== $phoneColIdx ? trim((string) $data[$nomColIdx]) : '';
+                if (empty($nom)) {
+                    $nom = 'Inconnu (' . $phone . ')';
+                }
+
+                Prospect::create([
+                    'nom' => $nom,
+                    'prenom' => isset($data[$prenomColIdx]) && $prenomColIdx !== $phoneColIdx ? trim((string) $data[$prenomColIdx]) ?: null : null,
+                    'email' => isset($data[$emailColIdx]) && $emailColIdx !== $phoneColIdx ? trim((string) $data[$emailColIdx]) ?: null : null,
+                    'telephone' => $phone,
+                    'entreprise' => isset($data[$entrepriseColIdx]) && $entrepriseColIdx !== $phoneColIdx ? trim((string) $data[$entrepriseColIdx]) ?: null : null,
+                    'statut' => 'Nouveau',
+                    'filiale_id' => $request->filiale_id,
+                    'commercial_id' => auth()->id(),
+                ]);
+                $count++;
             }
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            fclose($handle);
-            return back()->with('error', "Erreur lors de l'importation: " . $e->getMessage());
+            return back()->with('error', "Erreur lors de l'importation : " . $e->getMessage());
         }
-        fclose($handle);
-        
-        ActivityLog::log('Import prospects', 'Prospects', "$count prospects importés via CSV.");
+
+        ActivityLog::log('Import prospects', 'Prospects', "$count prospects importés via fichier Excel/CSV.");
 
         return redirect()->route('prospects.index')->with('success', "$count prospects ont été importés avec succès.");
     }
