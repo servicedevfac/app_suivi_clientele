@@ -16,76 +16,13 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProspectHistoryController;
+use App\Http\Controllers\DashboardController;
 
 
 
-Route::get('/dashboard', function () {
-    $user = auth()->user();
-    $isAdmin = $user->hasRole(['Administrateur', 'Directeur Général', 'Responsable Commercial']);
-
-    $prospectQuery = \App\Models\Prospect::query();
-    $clientQuery = \App\Models\Client::query();
-    $venteQuery = \App\Models\Vente::query();
-
-    if (!$isAdmin) {
-        $prospectQuery->where('commercial_id', $user->id);
-        $clientQuery->where('commercial_id', $user->id);
-        $venteQuery->where('commercial_id', $user->id);
-    }
-
-    $ventes = (clone $venteQuery)
-        ->where(function($q) {
-            $q->where('date_vente', '>=', now()->subMonths(5)->startOfMonth())
-              ->orWhere(function($q2) {
-                  $q2->whereNull('date_vente')
-                     ->where('created_at', '>=', now()->subMonths(5)->startOfMonth());
-              });
-        })
-        ->get()
-        ->groupBy(function($vente) {
-            $date = $vente->date_vente ?? $vente->created_at;
-            return $date ? $date->format('m/Y') : now()->format('m/Y');
-        });
-
-    $ventesLabels = $ventes->keys();
-    $ventesData = $ventes->map(fn($group) => $group->sum('montant'))->values();
-
-    $prospects = (clone $prospectQuery)->get()->groupBy('statut');
-    $prospectsLabels = $prospects->keys()->map(fn($s) => ucfirst($s));
-    $prospectsData = $prospects->map(fn($group) => $group->count())->values();
-
-    $objectif = \App\Models\Objectif::where('commercial_id', $user->id)
-        ->where('mois', now()->format('Y-m'))
-        ->first();
-        
-    $caPrevisionnel = (clone $prospectQuery)->whereNotIn('statut', ['Gagné', 'Perdu'])
-        ->get()
-        ->sum(function($p) {
-            return ($p->montant_estime ?? 0) * (($p->probabilite ?? 0) / 100);
-        });
-
-    $ventesMoisSum = (clone $venteQuery)
-        ->whereMonth('date_vente', now()->month)
-        ->whereYear('date_vente', now()->year)
-        ->sum('montant');
-
-    $stats = [
-        'prospects_count' => $prospectQuery->count(),
-        'clients_count' => $clientQuery->count(),
-        'ventes_sum' => $venteQuery->sum('montant') ?? 0,
-        'ventes_mois_sum' => $ventesMoisSum ?? 0,
-        'produits_count' => \App\Models\Produit::count(),
-        'objectif_mois' => $objectif ? $objectif->montant_cible : null,
-        'ca_previsionnel' => $caPrevisionnel,
-        'recent_prospects' => (clone $prospectQuery)->with('commercial')->latest()->take(5)->get(),
-        'recent_ventes' => (clone $venteQuery)->with(['client', 'produit', 'commercial'])->latest()->take(5)->get(),
-        'chart_ventes_labels' => $ventesLabels,
-        'chart_ventes_data' => $ventesData,
-        'chart_prospects_labels' => $prospectsLabels,
-        'chart_prospects_data' => $prospectsData,
-    ];
-    return view('dashboard', compact('stats'));
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
