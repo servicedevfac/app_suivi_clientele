@@ -34,7 +34,7 @@
                     <!-- Nom -->
                     <div>
                         <x-input-label for="nom" value="Nom" class="text-slate-700 font-semibold" />
-                        <x-text-input id="nom" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="text" name="nom" :value="old('nom')" required />
+                        <x-text-input id="nom" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="text" name="nom" :value="old('nom')" />
                         <x-input-error :messages="$errors->get('nom')" class="mt-2 text-xs" />
                     </div>
 
@@ -47,8 +47,8 @@
 
                     <!-- Téléphone -->
                     <div>
-                        <x-input-label for="telephone" value="Téléphone" class="text-slate-700 font-semibold" />
-                        <x-text-input id="telephone" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="text" name="telephone" :value="old('telephone')" />
+                        <x-input-label for="telephone" value="Téléphone *" class="text-slate-700 font-semibold" />
+                        <x-text-input id="telephone" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="text" name="telephone" :value="old('telephone')" required />
                         <x-input-error :messages="$errors->get('telephone')" class="mt-2 text-xs" />
                     </div>
 

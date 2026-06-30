@@ -32,51 +32,7 @@ class UserSeeder extends Seeder
                 'is_active' => true,
                 'role' => 'Directeur Général',
             ],
-            [
-                'nom' => 'Martin',
-                'prenom' => 'Sophie',
-                'email' => 'responsable@crm.com',
-                'telephone' => '0603040506',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'role' => 'Responsable Commercial',
-            ],
-            [
-                'nom' => 'Dubois',
-                'prenom' => 'Thomas',
-                'email' => 'thomas.dubois@crm.com',
-                'telephone' => '0604050607',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'role' => 'Commercial',
-            ],
-            [
-                'nom' => 'Lefevre',
-                'prenom' => 'Alice',
-                'email' => 'alice.lefevre@crm.com',
-                'telephone' => '0605060708',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'role' => 'Commercial',
-            ],
-            [
-                'nom' => 'Moreau',
-                'prenom' => 'Lucas',
-                'email' => 'lucas.moreau@crm.com',
-                'telephone' => '0606070809',
-                'password' => Hash::make('password'),
-                'is_active' => true,
-                'role' => 'Commercial',
-            ],
-            [
-                'nom' => 'Petit',
-                'prenom' => 'Julie',
-                'email' => 'julie.petit@crm.com',
-                'telephone' => '0607080910',
-                'password' => Hash::make('password'),
-                'is_active' => false,
-                'role' => 'Commercial',
-            ],
+           
         ];
 
         foreach ($usersData as $data) {
