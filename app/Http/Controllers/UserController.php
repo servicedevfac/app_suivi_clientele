@@ -25,12 +25,14 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
+        $rawPassword = $request->filled('password') ? $request->password : \Illuminate\Support\Str::password(16);
+
         $user = User::create([
             'nom' => $request->nom,
             'prenom' => $request->prenom,
             'email' => $request->email,
             'telephone' => $request->telephone,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => \Illuminate\Support\Facades\Hash::make($rawPassword),
             'is_active' => $request->has('is_active'),
         ]);
 
@@ -38,9 +40,22 @@ class UserController extends Controller
             $user->syncRoles($request->roles);
         }
 
+        // Génération du token de réinitialisation et envoi de l'email pour définir le mot de passe initial
+        try {
+            $token = \Illuminate\Support\Facades\Password::broker()->createToken($user);
+            $resetUrl = route('password.reset', [
+                'token' => $token,
+                'email' => $user->email,
+            ]);
+
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\InitialPasswordMail($user, $resetUrl));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Erreur lors de l'envoi de l'email d'initialisation de mot de passe : " . $e->getMessage());
+        }
+
         \App\Models\ActivityLog::log('Création utilisateur', 'Utilisateurs', "Création de l'utilisateur {$user->prenom} {$user->nom} (email: {$user->email}) avec les rôles : " . implode(', ', $request->roles ?? []));
 
-        return redirect()->route('users.index')->with('success', 'Utilisateur créé avec succès.');
+        return redirect()->route('users.index')->with('success', 'Utilisateur créé avec succès et email de configuration du mot de passe envoyé.');
     }
 
     public function show(User $user)
