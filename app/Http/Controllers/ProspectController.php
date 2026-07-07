@@ -89,6 +89,10 @@ class ProspectController extends Controller
         if (empty($validated['nom'])) {
             $validated['nom'] = 'Inconnu (' . ($validated['telephone'] ?? 'Sans numéro') . ')';
         }
+        // Set default values for missing fields
+        $validated['montant_estime'] = $validated['montant_estime'] ?? null;
+        $validated['probabilite'] = $validated['probabilite'] ?? 0;
+        $validated['score'] = $validated['score'] ?? 0;
 
         $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
         if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
@@ -158,6 +162,10 @@ class ProspectController extends Controller
         if (empty($validated['nom'])) {
             $validated['nom'] = 'Inconnu (' . ($validated['telephone'] ?? 'Sans numéro') . ')';
         }
+        // Set default values for missing fields
+        $validated['montant_estime'] = $validated['montant_estime'] ?? $prospect->montant_estime;
+        $validated['probabilite'] = $validated['probabilite'] ?? $prospect->probabilite;
+        $validated['score'] = $validated['score'] ?? $prospect->score;
         
         $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
         if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
@@ -486,18 +494,21 @@ class ProspectController extends Controller
                 }
 
                 Prospect::create([
-                    'nom' => $nom,
-                    'prenom' => isset($data[$prenomColIdx]) && $prenomColIdx !== $phoneColIdx ? trim((string) $data[$prenomColIdx]) ?: null : null,
-                    'email' => isset($data[$emailColIdx]) && $emailColIdx !== $phoneColIdx ? trim((string) $data[$emailColIdx]) ?: null : null,
-                    'telephone' => $phone,
-                    'entreprise' => isset($data[$entrepriseColIdx]) && $entrepriseColIdx !== $phoneColIdx ? trim((string) $data[$entrepriseColIdx]) ?: null : null,
-                    'statut' => 'Nouveau',                   
-                    'commentaire' => isset($data[$commentaireColIdx]) && $commentaireColIdx !== $phoneColIdx ? trim((string) $data[$commentaireColIdx]) ?: null : null,
-                    'filiale_id' => $request->filiale_id,
-                    'source_id' => $sourceId,
-                    'campagne_id' => $campagneId,
-                    'commercial_id' => auth()->id(),
-                ]);
+                        'nom' => $nom,
+                        'prenom' => isset($data[$prenomColIdx]) && $prenomColIdx !== $phoneColIdx ? trim((string) $data[$prenomColIdx]) ?: null : null,
+                        'email' => isset($data[$emailColIdx]) && $emailColIdx !== $phoneColIdx ? trim((string) $data[$emailColIdx]) ?: null : null,
+                        'telephone' => $phone,
+                        'entreprise' => isset($data[$entrepriseColIdx]) && $entrepriseColIdx !== $phoneColIdx ? trim((string) $data[$entrepriseColIdx]) ?: null : null,
+                        'statut' => 'Nouveau',
+                        'commentaire' => isset($data[$commentaireColIdx]) && $commentaireColIdx !== $phoneColIdx ? trim((string) $data[$commentaireColIdx]) ?: null : null,
+                        'filiale_id' => $request->filiale_id,
+                        'source_id' => $sourceId,
+                        'campagne_id' => $campagneId,
+                        'commercial_id' => auth()->id(),
+                        'montant_estime' => null,
+                        'probabilite' => 0,
+                        'score' => 0,
+                    ]);
                 $count++;
             }
             DB::commit();
