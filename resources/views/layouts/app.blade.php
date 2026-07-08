@@ -105,13 +105,13 @@
                 <main class="flex-1 py-8 px-4 sm:px-6 lg:px-8">
                     <!-- Page Header Slot -->
                     @isset($header)
-                        <div class="max-w-7xl mx-auto mb-8">
+                        <div class="max-w-[1600px] mx-auto mb-8">
                             {{ $header }}
                         </div>
                     @endisset
 
                     <!-- Main View Content Slot -->
-                    <div class="max-w-7xl mx-auto">
+                    <div class="max-w-[1600px] mx-auto">
                         {{ $slot }}
                     </div>
                 </main>

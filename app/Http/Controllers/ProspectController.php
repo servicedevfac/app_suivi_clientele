@@ -434,6 +434,7 @@ class ProspectController extends Controller
         $commentaireColIdx = 5;
         $sourceColIdx = -1;
         $campagneColIdx = -1;
+        $dateColIdx = -1;
 
         // Si le fichier contient plusieurs colonnes ou une ligne d'en-tête
         if (count($headerRow) > 1 || preg_match('/nom|t[eé]l|mail|phone|num/i', (string) ($headerRow[0] ?? ''))) {
@@ -456,6 +457,8 @@ class ProspectController extends Controller
                     $sourceColIdx = $idx;
                 } elseif (preg_match('/camp/i', $t)) {
                     $campagneColIdx = $idx;
+                } elseif (preg_match('/date|cr[eé]at/i', $t)) {
+                    $dateColIdx = $idx;
                 }
             }
             array_shift($rows); // Ignorer l'en-tête
@@ -493,22 +496,47 @@ class ProspectController extends Controller
                     }
                 }
 
-                Prospect::create([
-                        'nom' => $nom,
-                        'prenom' => isset($data[$prenomColIdx]) && $prenomColIdx !== $phoneColIdx ? trim((string) $data[$prenomColIdx]) ?: null : null,
-                        'email' => isset($data[$emailColIdx]) && $emailColIdx !== $phoneColIdx ? trim((string) $data[$emailColIdx]) ?: null : null,
-                        'telephone' => $phone,
-                        'entreprise' => isset($data[$entrepriseColIdx]) && $entrepriseColIdx !== $phoneColIdx ? trim((string) $data[$entrepriseColIdx]) ?: null : null,
-                        'statut' => 'Nouveau',
-                        'commentaire' => isset($data[$commentaireColIdx]) && $commentaireColIdx !== $phoneColIdx ? trim((string) $data[$commentaireColIdx]) ?: null : null,
-                        'filiale_id' => $request->filiale_id,
-                        'source_id' => $sourceId,
-                        'campagne_id' => $campagneId,
-                        'commercial_id' => auth()->id(),
-                        'montant_estime' => null,
-                        'probabilite' => 0,
-                        'score' => 0,
-                    ]);
+                $parsedDate = null;
+                if ($dateColIdx !== -1 && isset($data[$dateColIdx]) && !empty(trim((string) $data[$dateColIdx]))) {
+                    $val = trim((string) $data[$dateColIdx]);
+                    try {
+                        // Gestion des numéros de série Excel (ex: 45300) vs dates en texte ('Y-m-d', 'd/m/Y')
+                        if (is_numeric($val) && $val > 20000 && $val < 100000) {
+                            $parsedDate = \Carbon\Carbon::createFromDate(1900, 1, 1)->addDays($val - 2);
+                        } else {
+                            $parsedDate = \Carbon\Carbon::parse($val);
+                        }
+                    } catch (\Exception $e) {
+                        $parsedDate = null;
+                    }
+                }
+
+                $prospect = new Prospect([
+                    'nom' => $nom,
+                    'prenom' => isset($data[$prenomColIdx]) && $prenomColIdx !== $phoneColIdx ? trim((string) $data[$prenomColIdx]) ?: null : null,
+                    'email' => isset($data[$emailColIdx]) && $emailColIdx !== $phoneColIdx ? trim((string) $data[$emailColIdx]) ?: null : null,
+                    'telephone' => $phone,
+                    'entreprise' => isset($data[$entrepriseColIdx]) && $entrepriseColIdx !== $phoneColIdx ? trim((string) $data[$entrepriseColIdx]) ?: null : null,
+                    'statut' => 'Nouveau',
+                    'commentaire' => isset($data[$commentaireColIdx]) && $commentaireColIdx !== $phoneColIdx ? trim((string) $data[$commentaireColIdx]) ?: null : null,
+                    'filiale_id' => $request->filiale_id,
+                    'source_id' => $sourceId,
+                    'campagne_id' => $campagneId,
+                    'commercial_id' => auth()->id(),
+                    'montant_estime' => null,
+                    'probabilite' => 0,
+                    'score' => 0,
+                    'date_contact' => $parsedDate ?? now(),
+                ]);
+
+                if ($parsedDate) {
+                    $prospect->created_at = $parsedDate;
+                    $prospect->updated_at = $parsedDate;
+                    $prospect->save(['timestamps' => false]);
+                } else {
+                    $prospect->save();
+                }
+
                 $count++;
             }
             DB::commit();
