@@ -60,19 +60,28 @@
                     <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Sécurité & Accès</h2>
                     <p class="text-xs text-slate-500 mt-0.5">Mot de passe de connexion et habilitations.</p>
                 </div>
-                
+                <div class="mb-4 p-4 rounded-xl bg-indigo-50/60 border border-indigo-100 flex items-start space-x-3">
+                    <svg class="w-5 h-5 text-indigo-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="text-xs text-indigo-900">
+                        <span class="font-bold">Configuration automatique par email :</span>
+                        Si vous laissez les champs de mot de passe vides, un email d'activation sécurisé sera automatiquement envoyé au collaborateur pour lui permettre de définir son mot de passe initial en respectant les règles de sécurité.
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Mot de passe -->
                     <div>
-                        <x-input-label for="password" value="Mot de passe" class="text-slate-700 font-semibold" />
-                        <x-text-input id="password" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="password" name="password" required autocomplete="new-password" />
+                        <x-input-label for="password" value="Mot de passe (Optionnel)" class="text-slate-700 font-semibold" />
+                        <x-text-input id="password" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="password" name="password" autocomplete="new-password" placeholder="Laisser vide pour envoi par email" />
                         <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs" />
                     </div>
 
                     <!-- Confirmation Mot de passe -->
                     <div>
                         <x-input-label for="password_confirmation" value="Confirmer Mot de passe" class="text-slate-700 font-semibold" />
-                        <x-text-input id="password_confirmation" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="password" name="password_confirmation" required autocomplete="new-password" />
+                        <x-text-input id="password_confirmation" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500" type="password" name="password_confirmation" autocomplete="new-password" placeholder="Répéter si renseigné" />
                     </div>
 
                     <!-- Rôles -->

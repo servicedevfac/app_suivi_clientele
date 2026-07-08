@@ -27,7 +27,7 @@ class StoreUserRequest extends FormRequest
             'prenom' => 'nullable|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'telephone' => 'nullable|string|max:20',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => ['nullable', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
             'roles' => 'nullable|array',
             'roles.*' => 'exists:roles,name',
         ];

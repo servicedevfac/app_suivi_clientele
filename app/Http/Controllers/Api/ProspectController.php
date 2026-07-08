@@ -88,6 +88,11 @@ class ProspectController extends Controller
             $validated['commercial_id'] = $request->user()->id;
         }
 
+        // Set default values for missing fields
+        $validated['montant_estime'] = $validated['montant_estime'] ?? null;
+        $validated['probabilite'] = $validated['probabilite'] ?? 0;
+        $validated['score'] = $validated['score'] ?? 0;
+
         $prospect = Prospect::create($validated);
 
         return response()->json($prospect, 201);
@@ -134,6 +139,11 @@ class ProspectController extends Controller
             }
             $validated['commercial_id'] = $user->id;
         }
+
+        // Set default values for missing fields
+        $validated['montant_estime'] = $validated['montant_estime'] ?? $prospect->montant_estime;
+        $validated['probabilite'] = $validated['probabilite'] ?? $prospect->probabilite;
+        $validated['score'] = $validated['score'] ?? $prospect->score;
 
         $prospect->update($validated);
 
