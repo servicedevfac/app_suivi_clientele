@@ -289,12 +289,15 @@
                                 @endif
                             </td>
                             <!-- Commentaire -->
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center space-x-1">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                        <span class="text-slate-600 text-xs">{{ $prospect->commentaire }}</span>
+                            <td class="px-6 py-4 max-w-[280px]">
+                                @if($prospect->commentaire)
+                                    <div class="flex items-center space-x-1.5" title="{{ $prospect->commentaire }}">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400 flex-shrink-0"></span>
+                                        <span class="text-slate-600 text-xs truncate">{{ $prospect->commentaire }}</span>
                                     </div>
-                               
+                                @else
+                                    <span class="text-slate-400 text-xs italic">—</span>
+                                @endif
                             </td>
                             <!-- Statut Badge -->
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -315,23 +318,6 @@
                             </td>
                             <!-- Actions -->
                             <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-semibold space-x-2">
-                                <!-- Convert to client button -->
-                                @if(!$prospect->client()->exists() && $prospect->statut !== 'Gagné')
-                                    <form action="{{ route('prospects.convert', $prospect) }}" method="POST" class="inline-block" onsubmit="return confirm('Voulez-vous vraiment convertir ce prospect en client ?');">
-                                        @csrf
-                                        <button type="submit" class="inline-flex items-center justify-center px-2.5 py-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-lg transition-colors" title="Convertir en client">
-                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                            </svg>
-                                            Convertir
-                                        </button>
-                                    </form>
-                                @else
-                                    <span class="inline-flex items-center text-[10px] font-bold text-slate-400 bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-lg select-none">
-                                        Client converti
-                                    </span>
-                                @endif
-
                                 <a href="{{ route('prospects.show', $prospect) }}" class="inline-flex items-center justify-center p-2 text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors" title="Détails">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
