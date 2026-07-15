@@ -45,7 +45,62 @@ class CampagneController extends Controller
      */
     public function show(Campagne $campagne)
     {
-        return view('campagnes.show', compact('campagne'));
+        $campagne->load(['publications.prospects.client.ventes', 'prospects.publication', 'prospects.commercial', 'prospects.client.ventes']);
+
+        // Calcul des statistiques agrégées par Canal / Moyen de communication
+        $publications = $campagne->publications;
+        $statsParCanal = collect();
+
+        // 1. Groupement des publications par canal
+        $grouped = $publications->groupBy('canal');
+        foreach ($grouped as $canal => $pubs) {
+            $prospectsCount = $pubs->sum(function ($pub) {
+                return $pub->prospects->count();
+            });
+            $conversionsCount = $pubs->sum('conversions_count');
+            $chiffreAffaires = $pubs->sum('chiffre_affaires');
+            $budgetCanal = $pubs->sum('budget');
+            $tauxConversion = $prospectsCount > 0 ? round(($conversionsCount / $prospectsCount) * 100, 1) : 0;
+
+            $statsParCanal->push((object)[
+                'canal' => $canal,
+                'nombre_publications' => $pubs->count(),
+                'prospects_count' => $prospectsCount,
+                'conversions_count' => $conversionsCount,
+                'chiffre_affaires' => $chiffreAffaires,
+                'budget' => $budgetCanal,
+                'taux_conversion' => $tauxConversion,
+            ]);
+        }
+
+        // 2. Gestion des prospects de la campagne sans publication attribuée
+        $prospectsNonAttribues = $campagne->prospects->whereNull('publication_id');
+        if ($prospectsNonAttribues->count() > 0) {
+            $prospectsCount = $prospectsNonAttribues->count();
+            $conversionsCount = $prospectsNonAttribues->filter(fn($p) => $p->client !== null)->count();
+            $chiffreAffaires = $prospectsNonAttribues->sum(fn($p) => $p->client ? $p->client->ventes->sum('montant') : 0);
+            $tauxConversion = $prospectsCount > 0 ? round(($conversionsCount / $prospectsCount) * 100, 1) : 0;
+
+            $statsParCanal->push((object)[
+                'canal' => 'Non attribué / Direct',
+                'nombre_publications' => 0,
+                'prospects_count' => $prospectsCount,
+                'conversions_count' => $conversionsCount,
+                'chiffre_affaires' => $chiffreAffaires,
+                'budget' => 0,
+                'taux_conversion' => $tauxConversion,
+            ]);
+        }
+
+        // Tri par nombre de prospects par défaut
+        $statsParCanal = $statsParCanal->sortByDesc('prospects_count')->values();
+
+        // Détermination du meilleur canal
+        $canauxExplicites = $statsParCanal->where('nombre_publications', '>', 0);
+        $meilleurCanalProspects = $canauxExplicites->sortByDesc('prospects_count')->first() ?? $statsParCanal->first();
+        $meilleurCanalCA = $canauxExplicites->sortByDesc('chiffre_affaires')->first() ?? $statsParCanal->sortByDesc('chiffre_affaires')->first();
+
+        return view('campagnes.show', compact('campagne', 'statsParCanal', 'meilleurCanalProspects', 'meilleurCanalCA'));
     }
 
     /**

@@ -11,18 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('relances', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('prospect_id')->constrained('prospects')->onDelete('cascade');
-            $table->foreignId('commercial_id')->nullable()->constrained('users')->onDelete('set null');
-            $table->date('date_relance');
-            $table->time('heure_relance')->nullable();
-            $table->string('canal')->nullable(); // Appel, WhatsApp, Email, SMS, Rendez-vous
-            $table->text('commentaire')->nullable();
-            $table->string('statut')->default('En attente')->index();
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        if (!Schema::hasTable('relances')) {
+            Schema::create('relances', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('prospect_id')->constrained('prospects')->onDelete('cascade');
+                $table->foreignId('commercial_id')->nullable()->constrained('users')->onDelete('set null');
+                $table->date('date_relance');
+                $table->time('heure_relance')->nullable();
+                $table->string('canal')->nullable(); // Appel, WhatsApp, Email, SMS, Rendez-vous
+                $table->text('commentaire')->nullable();
+                $table->string('statut')->default('En attente')->index();
+                $table->timestamps();
+                $table->softDeletes();
+            });
+        }
     }
 
     /**

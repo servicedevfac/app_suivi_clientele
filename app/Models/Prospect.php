@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Prospect extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['commercial_id', 'source_id', 'campagne_id', 'filiale_id', 'nom', 'prenom', 'email', 'telephone', 'entreprise', 'profession', 'adresse', 'ville', 'statut', 'besoin', 'montant_estime', 'probabilite', 'commentaire', 'date_contact', 'prochain_rappel', 'tags', 'score'];
+    protected $fillable = ['commercial_id', 'source_id', 'campagne_id', 'publication_id', 'filiale_id', 'nom', 'prenom', 'email', 'telephone', 'entreprise', 'profession', 'adresse', 'ville', 'statut', 'besoin', 'montant_estime', 'probabilite', 'commentaire', 'date_contact', 'prochain_rappel', 'tags', 'score'];
     protected $casts = ['date_contact' => 'datetime', 'prochain_rappel' => 'datetime', 'tags' => 'array'];
 
     public function commercial() { return $this->belongsTo(User::class, 'commercial_id'); }
     public function source() { return $this->belongsTo(Source::class); }
     public function campagne() { return $this->belongsTo(Campagne::class); }
+    public function publication() { return $this->belongsTo(Publication::class); }
     public function filiale() { return $this->belongsTo(Filiale::class); }
     
     public function histories() { return $this->hasMany(ProspectHistory::class); }

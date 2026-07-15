@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Filiale;
 use App\Models\Source;
 use App\Models\Campagne;
+use App\Models\Publication;
 use App\Models\ProspectHistory;
 use App\Models\ActivityLog;
 use App\Models\Client;
@@ -76,8 +77,9 @@ class ProspectController extends Controller
         $filiales = Filiale::all();
         $sources = Source::all();
         $campagnes = Campagne::all();
+        $publications = Publication::where('statut', 'active')->latest()->get();
 
-        return view('prospects.create', compact('commercials', 'filiales', 'sources', 'campagnes'));
+        return view('prospects.create', compact('commercials', 'filiales', 'sources', 'campagnes', 'publications'));
     }
 
     /**
@@ -149,8 +151,9 @@ class ProspectController extends Controller
         $filiales = Filiale::all();
         $sources = Source::all();
         $campagnes = Campagne::all();
+        $publications = Publication::where('statut', 'active')->latest()->get();
 
-        return view('prospects.edit', compact('prospect', 'commercials', 'filiales', 'sources', 'campagnes'));
+        return view('prospects.edit', compact('prospect', 'commercials', 'filiales', 'sources', 'campagnes', 'publications'));
     }
 
     /**
