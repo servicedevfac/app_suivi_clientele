@@ -26,6 +26,7 @@ class UpdateProspectRequest extends FormRequest
             'commercial_id' => ['nullable', 'exists:users,id'],
             'source_id' => ['nullable', 'exists:sources,id'],
             'campagne_id' => ['nullable', 'exists:campagnes,id'],
+            'publication_id' => ['nullable', 'exists:publications,id'],
             'filiale_id' => ['required', 'exists:filiales,id'],
             'nom' => ['nullable', 'string', 'max:255'],
             'prenom' => ['nullable', 'string', 'max:255'],

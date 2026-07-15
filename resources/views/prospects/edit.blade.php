@@ -75,7 +75,7 @@
                     <h2 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Provenance & Rôles</h2>
                     <p class="text-xs text-slate-500 mt-0.5">Affectation géographique, commerciale et origine du prospect.</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" x-data="{ selectedCampagne: '{{ old('campagne_id', $prospect->campagne_id ?? '') }}' }">
                     <!-- Filiale -->
                     <div>
                         <x-input-label for="filiale_id" value="Filiale concernée" class="text-slate-700 font-semibold" />
@@ -115,13 +115,30 @@
                     <!-- Campagne -->
                     <div>
                         <x-input-label for="campagne_id" value="Campagne Marketing" class="text-slate-700 font-semibold" />
-                        <select id="campagne_id" name="campagne_id" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm">
+                        <select id="campagne_id" name="campagne_id" x-model="selectedCampagne" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm">
                             <option value="">Sélectionnez une campagne</option>
                             @foreach($campagnes as $campagne)
                                 <option value="{{ $campagne->id }}" {{ old('campagne_id', $prospect->campagne_id) == $campagne->id ? 'selected' : '' }}>{{ $campagne->nom }}</option>
                             @endforeach
                         </select>
                         <x-input-error :messages="$errors->get('campagne_id')" class="mt-2 text-xs" />
+                    </div>
+
+                    <!-- Publication / Moyen -->
+                    <div>
+                        <x-input-label for="publication_id" value="Publication / Moyen exact d'acquisition" class="text-slate-700 font-semibold" />
+                        <select id="publication_id" name="publication_id" class="block mt-1 w-full rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-indigo-500 text-sm shadow-sm">
+                            <option value="">Direct / Non spécifié</option>
+                            @if(isset($publications))
+                                @foreach($publications as $pub)
+                                    <option value="{{ $pub->id }}" x-show="!selectedCampagne || selectedCampagne == '{{ $pub->campagne_id }}'" {{ old('publication_id', $prospect->publication_id) == $pub->id ? 'selected' : '' }}>
+                                        [{{ $pub->canal }}] {{ Str::limit($pub->titre, 40) }} ({{ $pub->campagne->nom ?? '' }})
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <p class="text-[11px] text-slate-400 mt-1">Sélectionnez le support ou le canal qui a attiré ce prospect.</p>
+                        <x-input-error :messages="$errors->get('publication_id')" class="mt-2 text-xs" />
                     </div>
 
                     <!-- Statut -->

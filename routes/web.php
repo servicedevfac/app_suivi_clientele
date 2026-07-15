@@ -6,6 +6,7 @@ use App\Http\Controllers\FilialeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\CampagneController;
+use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\ProduitController;
 use App\Http\Controllers\ProspectController;
 use App\Http\Controllers\RelanceController;
@@ -41,6 +42,7 @@ Route::middleware(['auth', 'user.status'])->group(function () {
     // Entités Catalogue & Marketing
     Route::resource('sources', SourceController::class);
     Route::resource('campagnes', CampagneController::class);
+    Route::resource('campagnes.publications', PublicationController::class)->only(['store', 'update', 'destroy']);
     Route::resource('produits', ProduitController::class);
     
     // Coeur du CRM

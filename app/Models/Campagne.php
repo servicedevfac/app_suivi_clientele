@@ -12,4 +12,5 @@ class Campagne extends Model
     protected $casts = ['date_debut' => 'date', 'date_fin' => 'date'];
     public function filiale() { return $this->belongsTo(Filiale::class); }
     public function prospects() { return $this->hasMany(Prospect::class); }
+    public function publications() { return $this->hasMany(Publication::class); }
 }
