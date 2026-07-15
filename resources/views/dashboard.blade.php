@@ -11,208 +11,141 @@
     </x-slot>
 
     {{-- ═══════════════════════════════════════════════════════════ --}}
-    {{-- SECTION 1: 9 KPI Cards (3×3 grid)                          --}}
+    {{-- SECTION 1: KPI Cards                                       --}}
     {{-- ═══════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
-
-        {{-- KPI 1: Chiffre d'affaires du mois --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-indigo-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl text-white shadow-md shadow-indigo-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    </div>
-                    @if($stats['ca_tendance'] != 0)
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold {{ $stats['ca_tendance'] > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stats['ca_tendance'] > 0 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"></path></svg>
-                            {{ abs($stats['ca_tendance']) }}%
-                        </span>
-                    @endif
+    <div class="mb-8 space-y-4">
+        {{-- KPI 1: Chiffre d'affaires du mois (Pleine largeur) --}}
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-semibold text-slate-700">CA du mois</p>
+                <div class="flex items-baseline gap-2 mt-2">
+                    <span class="text-3xl font-extrabold text-slate-900 tabular-nums">{{ number_format($stats['ca_mois'], 0, ',', ' ') }}</span>
+                    <span class="text-sm font-semibold text-slate-700">XOF</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">CA du mois</p>
-                <p class="text-2xl font-extrabold text-slate-900 tabular-nums" data-countup="{{ $stats['ca_mois'] }}">
-                    {{ number_format($stats['ca_mois'], 0, ',', ' ') }} <span class="text-sm font-semibold text-slate-400">XOF</span>
+                <p class="text-xs text-slate-500 mt-1">
+                    @if($stats['ventes_conclues'] > 0)
+                        {{ $stats['ventes_conclues'] }} {{ Str::plural('vente conclue', $stats['ventes_conclues']) }} ce mois-ci
+                    @else
+                        Aucune vente conclue ce mois-ci
+                    @endif
                 </p>
-                @if($stats['objectif_montant'] > 0)
-                    <div class="mt-3">
-                        <div class="w-full bg-slate-100 rounded-full h-1.5">
-                            <div class="bg-gradient-to-r from-indigo-500 to-indigo-600 h-1.5 rounded-full transition-all duration-1000 ease-out" style="width: {{ min($stats['objectif_pct'], 100) }}%"></div>
-                        </div>
-                        <p class="text-[10px] text-slate-400 mt-1 text-right">{{ $stats['objectif_pct'] }}% de l'objectif</p>
-                    </div>
-                @endif
+            </div>
+            <div class="w-12 h-12 bg-emerald-100/60 rounded-2xl flex items-center justify-center text-emerald-600 flex-shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
             </div>
         </div>
 
-        {{-- KPI 2: Objectif atteint --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-emerald-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl text-white shadow-md shadow-emerald-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        {{-- Grille 4 colonnes de 8 cartes --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {{-- Card 1: Prospects gérés --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     </div>
+                    <span class="text-sm font-semibold text-slate-700">Prospects gérés</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Objectif atteint</p>
-                <div class="flex items-end gap-2">
-                    <p class="text-2xl font-extrabold text-slate-900">{{ $stats['objectif_pct'] }}<span class="text-lg text-slate-400">%</span></p>
-                </div>
-                {{-- Gauge circulaire --}}
-                <div class="mt-3 flex items-center gap-3">
-                    <div class="relative w-12 h-12 flex-shrink-0">
-                        <svg class="w-12 h-12 -rotate-90" viewBox="0 0 36 36">
-                            <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                            <path d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="url(#gaugeGradient)" stroke-width="3" stroke-dasharray="{{ $stats['objectif_pct'] }}, 100" stroke-linecap="round" class="transition-all duration-1000 ease-out"/>
-                            <defs><linearGradient id="gaugeGradient"><stop offset="0%" stop-color="#34d399"/><stop offset="100%" stop-color="#059669"/></linearGradient></defs>
-                        </svg>
-                    </div>
-                    <div class="text-xs text-slate-500">
-                        @if($stats['objectif_montant'] > 0)
-                            Objectif : <span class="font-bold text-slate-700">{{ number_format($stats['objectif_montant'], 0, ',', ' ') }} XOF</span>
-                        @else
-                            <span class="text-amber-500 font-semibold">Aucun objectif défini</span>
-                        @endif
-                    </div>
-                </div>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['prospects_count'], 0, ',', ' ') }}</p>
+                <p class="text-xs text-slate-500 mt-1">dont <span class="font-bold text-blue-600">{{ $stats['prospects_mois'] }}</span> ce mois</p>
             </div>
-        </div>
 
-        {{-- KPI 3: Prospects gérés --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-blue-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl text-white shadow-md shadow-blue-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+            {{-- Card 2: Taux de conversion --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                     </div>
-                    @if($stats['prospects_tendance'] != 0)
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold {{ $stats['prospects_tendance'] > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stats['prospects_tendance'] > 0 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"></path></svg>
-                            {{ abs($stats['prospects_tendance']) }}%
-                        </span>
-                    @endif
+                    <span class="text-sm font-semibold text-slate-700">Taux de conversion</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Prospects gérés</p>
-                <div class="flex items-end gap-3">
-                    <p class="text-2xl font-extrabold text-slate-900">{{ number_format($stats['prospects_count']) }}</p>
-                    <p class="text-sm text-slate-400 mb-0.5">dont <span class="font-bold text-blue-600">{{ $stats['prospects_mois'] }}</span> ce mois</p>
-                </div>
-            </div>
-        </div>
-
-        {{-- KPI 4: Taux de conversion --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-400 to-violet-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl text-white shadow-md shadow-violet-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                    </div>
+                <p class="text-2xl font-bold text-slate-900">{{ $stats['taux_conversion'] }}%</p>
+                <p class="text-xs text-slate-500 mt-1">
                     @if($stats['conversion_tendance'] != 0)
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold {{ $stats['conversion_tendance'] > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stats['conversion_tendance'] > 0 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"></path></svg>
-                            {{ abs($stats['conversion_tendance']) }}pts
-                        </span>
+                        <span class="{{ $stats['conversion_tendance'] > 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold' }}">{{ $stats['conversion_tendance'] > 0 ? '+' : '' }}{{ $stats['conversion_tendance'] }}%</span> vs mois préc.
+                    @else
+                        stable
                     @endif
-                </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Taux de conversion</p>
-                <p class="text-2xl font-extrabold text-slate-900">{{ $stats['taux_conversion'] }}<span class="text-lg text-slate-400">%</span></p>
+                </p>
             </div>
-        </div>
 
-        {{-- KPI 5: Appels effectués --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-amber-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-amber-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl text-white shadow-md shadow-amber-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+            {{-- Card 3: Appels effectués --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
                     </div>
-                    @if($stats['appels_tendance'] != 0)
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold {{ $stats['appels_tendance'] > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stats['appels_tendance'] > 0 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"></path></svg>
-                            {{ abs($stats['appels_tendance']) }}%
-                        </span>
-                    @endif
+                    <span class="text-sm font-semibold text-slate-700">Appels effectués</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Appels effectués</p>
-                <p class="text-2xl font-extrabold text-slate-900">{{ number_format($stats['appels_mois']) }}</p>
-                <p class="text-[11px] text-slate-400 mt-1">ce mois-ci</p>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['appels_mois'], 0, ',', ' ') }}</p>
+                <p class="text-xs text-slate-500 mt-1">ce mois-ci</p>
             </div>
-        </div>
 
-        {{-- KPI 6: Rendez-vous réalisés --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-cyan-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-400 to-cyan-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl text-white shadow-md shadow-cyan-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            {{-- Card 4: RDV réalisés --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
-                    @if($stats['rdv_tendance'] != 0)
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold {{ $stats['rdv_tendance'] > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stats['rdv_tendance'] > 0 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"></path></svg>
-                            {{ abs($stats['rdv_tendance']) }}%
-                        </span>
-                    @endif
+                    <span class="text-sm font-semibold text-slate-700">RDV réalisés</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">RDV réalisés</p>
-                <p class="text-2xl font-extrabold text-slate-900">{{ number_format($stats['rdv_mois']) }}</p>
-                <p class="text-[11px] text-slate-400 mt-1">ce mois-ci</p>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['rdv_mois'], 0, ',', ' ') }}</p>
+                <p class="text-xs text-slate-500 mt-1">ce mois-ci</p>
             </div>
-        </div>
 
-        {{-- KPI 7: Devis envoyés --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-orange-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-orange-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl text-white shadow-md shadow-orange-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            {{-- Card 5: Devis envoyés --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     </div>
+                    <span class="text-sm font-semibold text-slate-700">Devis envoyés</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Devis envoyés</p>
-                <p class="text-2xl font-extrabold text-slate-900">{{ number_format($stats['devis_mois']) }}</p>
-                <p class="text-[11px] text-slate-400 mt-1">en négociation</p>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['devis_mois'], 0, ',', ' ') }}</p>
+                <p class="text-xs text-slate-500 mt-1">en négociation</p>
             </div>
-        </div>
 
-        {{-- KPI 8: Ventes conclues --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-emerald-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-teal-600"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-teal-400 to-teal-600 rounded-xl text-white shadow-md shadow-teal-500/20">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{-- Card 6: Ventes conclues --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    @if($stats['ventes_tendance'] != 0)
-                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-bold {{ $stats['ventes_tendance'] > 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600' }}">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="{{ $stats['ventes_tendance'] > 0 ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7' }}"></path></svg>
-                            {{ abs($stats['ventes_tendance']) }}%
-                        </span>
-                    @endif
+                    <span class="text-sm font-semibold text-slate-700">Ventes conclues</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Ventes conclues</p>
-                <p class="text-2xl font-extrabold text-slate-900">{{ number_format($stats['ventes_conclues']) }}</p>
-                <p class="text-[11px] text-slate-400 mt-1">ce mois-ci</p>
+                <p class="text-2xl font-bold text-slate-900">{{ number_format($stats['ventes_conclues'], 0, ',', ' ') }}</p>
+                <p class="text-xs text-slate-500 mt-1">ce mois-ci</p>
             </div>
-        </div>
 
-        {{-- KPI 9: Satisfaction client (rétention) --}}
-        <div class="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg hover:shadow-pink-100/50 transition-all duration-300 overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-pink-400 to-rose-500"></div>
-            <div class="p-5">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="p-2.5 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl text-white shadow-md shadow-pink-500/20">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            {{-- Card 7: Rétention clients --}}
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
+                <div class="flex items-center gap-2.5 mb-3">
+                    <div class="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
                     </div>
+                    <span class="text-sm font-semibold text-slate-700">Rétention clients</span>
                 </div>
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Rétention clients</p>
-                <div class="flex items-end gap-2">
-                    <p class="text-2xl font-extrabold text-slate-900">{{ $stats['satisfaction'] }}<span class="text-lg text-slate-400">%</span></p>
+                <p class="text-2xl font-bold text-slate-900">{{ $stats['satisfaction'] }}%</p>
+                <p class="text-xs text-slate-500 mt-1">{{ $stats['clients_actifs'] }} actifs / {{ $stats['clients_total'] }} total</p>
+            </div>
+
+            {{-- Card 8: Objectif (Pointillée avec bouton) --}}
+            <div class="border border-dashed border-slate-200 rounded-2xl p-5 flex flex-col items-center justify-center text-center bg-white shadow-sm">
+                <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"></circle><circle cx="12" cy="12" r="6" stroke-width="2"></circle><circle cx="12" cy="12" r="2" stroke-width="2"></circle></svg>
                 </div>
-                <p class="text-[11px] text-slate-400 mt-1">{{ $stats['clients_actifs'] }} actifs / {{ $stats['clients_total'] }} total</p>
+                @if($stats['objectif_montant'] > 0)
+                    <p class="text-xs font-semibold text-slate-600 mb-1">Objectif : {{ number_format($stats['objectif_montant'], 0, ',', ' ') }} XOF</p>
+                    <p class="text-[11px] font-bold text-emerald-600 mb-2">{{ $stats['objectif_pct'] }}% atteint</p>
+                    <a href="{{ route('objectifs.index') }}" class="w-full px-3 py-1.5 text-xs font-semibold text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl shadow-sm flex items-center justify-center gap-1 transition-all">
+                        Modifier l'objectif
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path></svg>
+                    </a>
+                @else
+                    <p class="text-xs font-semibold text-slate-600 mb-2">Aucun objectif défini</p>
+                    <a href="{{ route('objectifs.index') }}" class="w-full px-3 py-1.5 text-xs font-semibold text-slate-800 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl shadow-sm flex items-center justify-center gap-1 transition-all">
+                        Définir un objectif
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"></path></svg>
+                    </a>
+                @endif
             </div>
         </div>
     </div>
