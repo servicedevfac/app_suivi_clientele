@@ -22,21 +22,35 @@ class StoreProspectRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->has('prospects') && is_array($this->prospects)) {
+            return [
+                'filiale_id' => ['nullable', 'exists:filiales,id'],
+                'prospects' => ['required', 'array', 'min:1'],
+                'prospects.*.nom' => ['nullable', 'string', 'max:255'],
+                'prospects.*.telephone' => ['nullable', 'string', 'max:50'],
+                'prospects.*.source_id' => ['nullable', 'exists:sources,id'],
+                'prospects.*.campagne_id' => ['nullable', 'exists:campagnes,id'],
+                'prospects.*.publication_id' => ['nullable', 'exists:publications,id'],
+                'prospects.*.commercial_id' => ['nullable', 'exists:users,id'],
+                'prospects.*.filiale_id' => ['nullable', 'exists:filiales,id'],
+            ];
+        }
+
         return [
             'commercial_id' => ['nullable', 'exists:users,id'],
             'source_id' => ['nullable', 'exists:sources,id'],
             'campagne_id' => ['nullable', 'exists:campagnes,id'],
             'publication_id' => ['nullable', 'exists:publications,id'],
-            'filiale_id' => ['required', 'exists:filiales,id'],
+            'filiale_id' => ['nullable', 'exists:filiales,id'],
             'nom' => ['nullable', 'string', 'max:255'],
             'prenom' => ['nullable', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
-            'telephone' => ['required', 'string', 'max:50'],
+            'telephone' => ['nullable', 'string', 'max:50'],
             'entreprise' => ['nullable', 'string', 'max:255'],
             'profession' => ['nullable', 'string', 'max:255'],
             'adresse' => ['nullable', 'string'],
             'ville' => ['nullable', 'string', 'max:255'],
-            'statut' => ['required', 'string', 'in:Nouveau,Contacté,Qualifié,En négociation,Gagné,Perdu'],
+            'statut' => ['nullable', 'string', 'in:Nouveau,Contacté,Qualifié,En négociation,Gagné,Perdu'],
             'besoin' => ['nullable', 'string'],
             'montant_estime' => ['nullable', 'numeric', 'min:0'],
             'probabilite' => ['nullable', 'integer', 'min:0', 'max:100'],

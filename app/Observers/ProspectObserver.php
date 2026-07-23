@@ -22,15 +22,15 @@ class ProspectObserver
     public function created(Prospect $prospect): void
     {
         // Si assigné à un commercial dès la création, on crée une tâche initiale
-        if ($prospect->commercial_id && $prospect->statut === 'Nouveau') {
+        if ($prospect->commercial_id && $prospect->statut === 'Contacté' && !$prospect->is_imported) {
             Task::create([
                 'user_id' => $prospect->commercial_id,
                 'prospect_id' => $prospect->id,
-                'titre' => 'Premier contact à établir',
-                'description' => 'Nouveau prospect assigné. Pensez à établir le premier contact rapidement.',
+                'titre' => 'Premier contact',
+                'description' => 'Premier contact établi avec le nouveau prospect.',
                 'priorite' => 'Haute',
-                'date_limite' => now()->addDays(2),
-                'statut' => 'À faire',
+                'date_limite' => now(),
+                'statut' => 'Terminé',
             ]);
         }
     }

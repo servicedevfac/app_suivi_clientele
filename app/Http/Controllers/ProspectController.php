@@ -87,14 +87,74 @@ class ProspectController extends Controller
      */
     public function store(StoreProspectRequest $request)
     {
+        $defaultFilialeId = $request->input('filiale_id') ?: (\App\Models\Filiale::first()->id ?? 1);
+
+        if ($request->has('prospects') && is_array($request->prospects)) {
+            $createdCount = 0;
+            DB::transaction(function () use ($request, $defaultFilialeId, &$createdCount) {
+                foreach ($request->prospects as $item) {
+                    $nom = trim($item['nom'] ?? '');
+                    $phone = trim($item['telephone'] ?? '');
+
+                    // Skip row if both name and phone are empty
+                    if (empty($nom) && empty($phone)) {
+                        continue;
+                    }
+
+                    if (empty($nom)) {
+                        $nom = 'Inconnu (' . ($phone ?: 'Sans numéro') . ')';
+                    }
+
+                    $filialeId = !empty($item['filiale_id']) ? $item['filiale_id'] : $defaultFilialeId;
+
+                    $commercialId = auth()->id();
+                    if (auth()->user()->hasRole('Administrateur|Responsable Commercial|Directeur Général') && !empty($item['commercial_id'])) {
+                        $commercialId = $item['commercial_id'];
+                    }
+
+                    $prospect = Prospect::create([
+                        'nom' => $nom,
+                        'telephone' => $phone ?: null,
+                        'source_id' => !empty($item['source_id']) ? $item['source_id'] : null,
+                        'campagne_id' => !empty($item['campagne_id']) ? $item['campagne_id'] : null,
+                        'publication_id' => !empty($item['publication_id']) ? $item['publication_id'] : null,
+                        'filiale_id' => $filialeId,
+                        'commercial_id' => $commercialId,
+                        'statut' => 'Nouveau',
+                        'date_contact' => now(),
+                    ]);
+
+                    $prospect->histories()->create([
+                        'user_id' => auth()->id(),
+                        'action' => 'Création',
+                        'description' => 'Création initiale du prospect.',
+                        'ancien_statut' => null,
+                        'nouveau_statut' => 'Nouveau',
+                    ]);
+
+                    ActivityLog::log('Création prospect', 'Prospects', "Création du prospect {$prospect->nom}.");
+                    $createdCount++;
+                }
+            });
+
+            if ($createdCount === 0) {
+                return redirect()->back()->with('error', 'Veuillez remplir au moins un prospect (Nom ou Téléphone).');
+            }
+
+            return redirect()->route('prospects.index')->with('success', "$createdCount prospect(s) créé(s) avec succès.");
+        }
+
         $validated = $request->validated();
         if (empty($validated['nom'])) {
             $validated['nom'] = 'Inconnu (' . ($validated['telephone'] ?? 'Sans numéro') . ')';
         }
-        // Set default values for missing fields
+
+        $validated['filiale_id'] = $validated['filiale_id'] ?? $defaultFilialeId;
+        $validated['statut'] = $validated['statut'] ?? 'Nouveau';
         $validated['montant_estime'] = $validated['montant_estime'] ?? null;
         $validated['probabilite'] = $validated['probabilite'] ?? 0;
         $validated['score'] = $validated['score'] ?? 0;
+        $validated['date_contact'] = $validated['date_contact'] ?? now();
 
         $assignableUsers = User::getAssignableUsers()->pluck('id')->toArray();
         if (isset($validated['commercial_id']) && !in_array($validated['commercial_id'], $assignableUsers)) {
@@ -128,6 +188,14 @@ class ProspectController extends Controller
         });
 
         ActivityLog::log('Création prospect', 'Prospects', "Création du prospect {$prospect->nom} {$prospect->prenom}.");
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Prospect créé avec succès.',
+                'prospect' => $prospect
+            ]);
+        }
 
         return redirect()->route('prospects.index')->with('success', 'Prospect créé avec succès.');
     }
@@ -531,6 +599,8 @@ class ProspectController extends Controller
                     'score' => 0,
                     'date_contact' => $parsedDate ?? now(),
                 ]);
+
+                $prospect->is_imported = true;
 
                 if ($parsedDate) {
                     $prospect->created_at = $parsedDate;

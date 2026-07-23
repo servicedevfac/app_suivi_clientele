@@ -3,16 +3,13 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">
-                    Bonjour, {{ Auth::user()->prenom ?? Auth::user()->nom }} 👋
+                   {{ Auth::user()->prenom ?? Auth::user()->nom }}
                 </h2>
-                <p class="text-sm text-slate-500 mt-1">Voici le résumé de vos performances — <span class="font-semibold text-indigo-600">{{ now()->translatedFormat('F Y') }}</span></p>
+                
             </div>
         </div>
     </x-slot>
 
-    {{-- ═══════════════════════════════════════════════════════════ --}}
-    {{-- SECTION 1: KPI Cards                                       --}}
-    {{-- ═══════════════════════════════════════════════════════════ --}}
     <div class="mb-8 space-y-4">
         {{-- KPI 1: Chiffre d'affaires du mois (Pleine largeur) --}}
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex items-center justify-between">
