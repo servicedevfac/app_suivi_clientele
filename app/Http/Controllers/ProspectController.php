@@ -600,6 +600,8 @@ class ProspectController extends Controller
                     'date_contact' => $parsedDate ?? now(),
                 ]);
 
+                $prospect->is_imported = true;
+
                 if ($parsedDate) {
                     $prospect->created_at = $parsedDate;
                     $prospect->updated_at = $parsedDate;

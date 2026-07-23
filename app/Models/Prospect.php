@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Prospect extends Model
 {
     use SoftDeletes;
+
+    public $is_imported = false;
+
     protected $fillable = ['commercial_id', 'source_id', 'campagne_id', 'publication_id', 'filiale_id', 'nom', 'prenom', 'email', 'telephone', 'entreprise', 'profession', 'adresse', 'ville', 'statut', 'besoin', 'montant_estime', 'probabilite', 'commentaire', 'date_contact', 'prochain_rappel', 'tags', 'score'];
     protected $casts = ['date_contact' => 'datetime', 'prochain_rappel' => 'datetime', 'tags' => 'array'];
 
